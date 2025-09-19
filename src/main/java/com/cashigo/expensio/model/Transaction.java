@@ -1,6 +1,7 @@
 package com.cashigo.expensio.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,6 +18,7 @@ import java.util.UUID;
                 @Index(name = "transaction_date_time_idx", columnList = "transactionDateTime")
         }
 )
+@Data
 public class Transaction {
 
     @Id

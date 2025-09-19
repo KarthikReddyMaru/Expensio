@@ -1,6 +1,7 @@
 package com.cashigo.expensio.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -13,6 +14,7 @@ import java.time.Instant;
                 @Index(name = "sub_category_name_idx", columnList = "name", unique = false),
         }
 )
+@Data
 public class SubCategory {
 
     @Id
