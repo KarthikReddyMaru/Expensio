@@ -2,10 +2,17 @@ package com.cashigo.expensio.config;
 
 import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.model.SubCategory;
+import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.CategoryRepository;
+import com.cashigo.expensio.repository.TransactionRepository;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Configuration
 public class BootConfig {
@@ -18,8 +25,14 @@ public class BootConfig {
         return sub;
     }
 
+    private SubCategory createSubCategoryRef(long id) {
+        SubCategory sub = new SubCategory();
+        sub.setId(id); // only set ID
+        return sub;
+    }
+
     @Bean
-    ApplicationRunner applicationRunner(CategoryRepository categoryRepository) {
+    ApplicationRunner applicationRunner(CategoryRepository categoryRepository, TransactionRepository transactionRepository) {
         return args -> {
 
             // 1. Food & Dining
@@ -137,6 +150,27 @@ public class BootConfig {
                     )
             );
             categoryRepository.save(apparel);
+
+            Transaction t1 = new Transaction();
+            t1.setUserId("Beast Boy");
+            t1.setAmount(BigDecimal.valueOf(150.0));
+            t1.setSubCategory(createSubCategoryRef(3));
+            t1.setTransactionDateTime(Instant.now().minus(3, ChronoUnit.DAYS));
+
+            Transaction t2 = new Transaction();
+            t2.setUserId("Beast Boy");
+            t2.setAmount(BigDecimal.valueOf(300.0));
+            t2.setSubCategory(createSubCategoryRef(21));
+            t2.setTransactionDateTime(Instant.now().minus(2, ChronoUnit.DAYS));
+
+            Transaction t3 = new Transaction();
+            t3.setUserId("Beast Boy");
+            t3.setAmount(BigDecimal.valueOf(450.0));
+            t3.setSubCategory(createSubCategoryRef(13));
+            t3.setTransactionDateTime(Instant.now().minus(1, ChronoUnit.DAYS));
+
+            transactionRepository.saveAll(List.of(t1, t2, t3));
+
         };
     }
 

@@ -17,4 +17,10 @@ public class SubCategoryExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(NoSubCategoryFoundException.class)
+    public ResponseEntity<ErrorResponse> noSubCategoryFound(NoSubCategoryFoundException exception) {
+        ErrorResponse errorResponse = ErrorResponseMapper.fromException(exception, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
 }

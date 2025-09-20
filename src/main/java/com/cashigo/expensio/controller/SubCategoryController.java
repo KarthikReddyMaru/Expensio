@@ -25,6 +25,14 @@ public class SubCategoryController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("{/subCategoryId}")
+    public ResponseEntity<Response<SubCategoryDto>> getSubCategoryById(@PathVariable Long subCategoryId) {
+        Response<SubCategoryDto> response = new Response<>();
+        SubCategoryDto subCategoryDto = subCategoryService.getSubCategoryById(subCategoryId);
+        response.setData(subCategoryDto);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping
     public ResponseEntity<Response<SubCategoryDto>> saveSubCategory(@RequestBody SubCategoryDto subCategory) {
         Response<SubCategoryDto> response = new Response<>();
