@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,7 @@ public class TransactionService {
         return transactions.stream().map(transactionMapper::mapToDto).toList();
     }
 
+    @Transactional
     public TransactionDto saveOrUpdateTransaction(TransactionDto unsavedTransaction) {
         Transaction transaction = transactionMapper.mapToEntity(unsavedTransaction);
         String userId = userContext.getUserId().orElse("Anonymous");
@@ -54,6 +56,7 @@ public class TransactionService {
         return transactionMapper.mapToDto(savedTransaction);
     }
 
+    @Transactional
     public void deleteTransaction(UUID transactionId) {
         String userId = userContext.getUserId().orElse("Anonymous");
         log.info("Transaction of {} is deleted with id {}", userContext.getUserName().orElse("Anonymous"), transactionId);

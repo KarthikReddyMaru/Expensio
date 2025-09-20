@@ -11,6 +11,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +41,7 @@ public class CategoryService {
     }
 
     @SneakyThrows
+    @Transactional
     public CategoryDto saveAndUpdateCategory(CategoryDto unsavedCategory) {
         log.info("Unsaved category {}", unsavedCategory);
         Category newCategory = categoryMapper.mapToEntity(unsavedCategory);
@@ -50,6 +52,7 @@ public class CategoryService {
         return categoryMapper.mapToDto(savedCategory);
     }
 
+    @Transactional
     public void deleteCategoryById(Long id) {
         String userId = userContext.getUserId().orElse("Anonymous");
         categoryRepository.deleteCategoryByIdAndUserId(id, userId);

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +38,7 @@ public class SubCategoryService {
         return subCategoryMapper.mapToDto(data);
     }
 
+    @Transactional
     public SubCategoryDto saveSubCategory(SubCategoryDto unsavedSubCategory) {
         SubCategory subCategory = subCategoryMapper.mapToEntity(unsavedSubCategory);
         SubCategory savedSubCategory = subCategoryRepository.save(subCategory);
@@ -45,6 +47,7 @@ public class SubCategoryService {
         return subCategoryMapper.mapToDto(savedSubCategory);
     }
 
+    @Transactional
     public void deleteSubCategory(Long subCategoryId) {
         String userId = userContext.getUserId().orElse("Anonymous");
         subCategoryRepository.deleteSubCategoryByIdAndCategory_UserId(subCategoryId, userId);
