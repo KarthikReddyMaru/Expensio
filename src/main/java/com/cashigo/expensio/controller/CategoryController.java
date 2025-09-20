@@ -19,7 +19,7 @@ public class CategoryController {
 
     @GetMapping
     public ResponseEntity<Response<List<CategoryDto>>> getAllCategories() {
-        List<CategoryDto> categoryDtoList = categoryService.getAllCategories();
+        List<CategoryDto> categoryDtoList = categoryService.getAllCategoriesByUserId();
         Response<List<CategoryDto>> response = new Response<>();
         response.setData(categoryDtoList);
         return ResponseEntity.ok(response);

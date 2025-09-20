@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.AccessDeniedException;
+
 @RestControllerAdvice
 public class TransactionExceptionHandler {
 
@@ -14,6 +16,12 @@ public class TransactionExceptionHandler {
     public ResponseEntity<ErrorResponse> noTransactionFound(NoTransactionFoundException exception) {
         ErrorResponse errorResponse = ErrorResponseMapper.fromException(exception, HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> accessDenied(AccessDeniedException exception) {
+        ErrorResponse errorResponse = ErrorResponseMapper.fromException(exception, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
 }

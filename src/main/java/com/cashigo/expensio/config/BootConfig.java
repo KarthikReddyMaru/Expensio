@@ -152,19 +152,19 @@ public class BootConfig {
             categoryRepository.save(apparel);
 
             Transaction t1 = new Transaction();
-            t1.setUserId("Beast Boy");
+            t1.setUserId("226bc242-1f1d-4ad7-b480-3e2bb0c94f16");
             t1.setAmount(BigDecimal.valueOf(150.0));
             t1.setSubCategory(createSubCategoryRef(3));
             t1.setTransactionDateTime(Instant.now().minus(3, ChronoUnit.DAYS));
 
             Transaction t2 = new Transaction();
-            t2.setUserId("Beast Boy");
+            t2.setUserId("226bc242-1f1d-4ad7-b480-3e2bb0c94f16");
             t2.setAmount(BigDecimal.valueOf(300.0));
             t2.setSubCategory(createSubCategoryRef(21));
             t2.setTransactionDateTime(Instant.now().minus(2, ChronoUnit.DAYS));
 
             Transaction t3 = new Transaction();
-            t3.setUserId("Beast Boy");
+            t3.setUserId("226bc242-1f1d-4ad7-b480-3e2bb0c94f16");
             t3.setAmount(BigDecimal.valueOf(450.0));
             t3.setSubCategory(createSubCategoryRef(13));
             t3.setTransactionDateTime(Instant.now().minus(1, ChronoUnit.DAYS));

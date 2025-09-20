@@ -26,10 +26,10 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(params = {"userId", "pageNum"})
-    public ResponseEntity<Response<List<TransactionDto>>> getTransactionByUserId(String userId, int pageNum) {
+    @GetMapping(params = {"pageNum"})
+    public ResponseEntity<Response<List<TransactionDto>>> getTransactionByUserId(int pageNum) {
         Response<List<TransactionDto>> response = new Response<>();
-        List<TransactionDto> transactions = transactionService.getAllTransactionByUserId(userId,pageNum);
+        List<TransactionDto> transactions = transactionService.getAllTransactionByUserId(pageNum);
         response.setData(transactions);
         return ResponseEntity.ok(response);
     }
