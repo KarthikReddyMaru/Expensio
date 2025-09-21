@@ -25,14 +25,14 @@ public class SubCategoryService {
     private final UserContext userContext;
 
     public List<SubCategoryDto> getSubCategories(Long categoryId) {
-        String userId = userContext.getUserId().orElse("Anonymous");
+        String userId = userContext.getUserId();
         List<SubCategory> subCategories = subCategoryRepository.findSubCategoriesByCategoryIdAndUserIdOrSystem(categoryId, userId);
         return subCategories.stream().map(subCategoryMapper::mapToDto).toList();
     }
 
     @SneakyThrows
     public SubCategoryDto getSubCategoryById(Long subCategoryId) {
-        String userId = userContext.getUserId().orElse("Anonymous");
+        String userId = userContext.getUserId();
         Optional<SubCategory> subCategory = subCategoryRepository.findSubCategoryByIdAndUserIdOrSystem(subCategoryId, userId);
         SubCategory data = subCategory.orElseThrow(NoSubCategoryFoundException::new);
         return subCategoryMapper.mapToDto(data);
@@ -43,16 +43,16 @@ public class SubCategoryService {
         SubCategory subCategory = subCategoryMapper.mapToEntity(unsavedSubCategory);
         SubCategory savedSubCategory = subCategoryRepository.save(subCategory);
         log.info("Sub category of {} is saved/updated in category (Id: {})",
-                userContext.getUserName().orElse("Anonymous"), savedSubCategory.getCategory().getId());
+                userContext.getUserName(), savedSubCategory.getCategory().getId());
         return subCategoryMapper.mapToDto(savedSubCategory);
     }
 
     @Transactional
     public void deleteSubCategory(Long subCategoryId) {
-        String userId = userContext.getUserId().orElse("Anonymous");
+        String userId = userContext.getUserId();
         subCategoryRepository.deleteSubCategoryByIdAndCategory_UserId(subCategoryId, userId);
         log.info("Sub Category of {} with id {} is deleted",
-                userContext.getUserName().orElse("Anonymous"), subCategoryId);
+                userContext.getUserName(), subCategoryId);
     }
 
 }

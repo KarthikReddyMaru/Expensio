@@ -16,4 +16,12 @@ public class ErrorResponseMapper {
         errorResponse.setTimestamp(Instant.now());
         return errorResponse;
     }
+
+    public static ErrorResponse fromMessage(String message, HttpStatus status) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMessage(message);
+        errorResponse.setStatusCode(status.value());
+        errorResponse.setTimestamp(Instant.now());
+        return errorResponse;
+    }
 }

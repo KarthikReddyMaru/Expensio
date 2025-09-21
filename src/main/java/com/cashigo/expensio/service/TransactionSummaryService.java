@@ -26,7 +26,7 @@ public class TransactionSummaryService {
     private int pageSize;
 
     public List<TransactionSummaryDto> getAllTransactionSummaryByUserId(int pageNum) {
-        String userId = userContext.getUserId().orElse("Anonymous");
+        String userId = userContext.getUserId();
         Sort sort = Sort.by("transactionDateTime").descending();
         Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
         List<Transaction> transactions = transactionRepository.findTransactionsByUserId(userId, pageable);

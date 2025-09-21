@@ -26,7 +26,7 @@ public class CategoryService {
     private final UserContext userContext;
 
     public List<CategoryDto> getAllCategoriesByUserId() {
-        String userId = userContext.getUserId().orElse("Anonymous");
+        String userId = userContext.getUserId();
         Sort sort = Sort.by("name").ascending();
         List<Category> categories = categoryRepository.findCategoriesByUserIdOrSystem(userId, sort);
         return categories.stream().map(categoryMapper::mapToDto).toList();
@@ -34,7 +34,7 @@ public class CategoryService {
 
     @SneakyThrows
     public CategoryDto getCategoryById(Long id) {
-        String userId = userContext.getUserId().orElse("Anonymous");
+        String userId = userContext.getUserId();
         Optional<Category> category = categoryRepository.findCategoryByIdAndUserIdOrSystem(id, userId);
         Category data = category.orElseThrow(CategoryNotFoundException::new);
         return categoryMapper.mapToDto(data);
@@ -45,7 +45,7 @@ public class CategoryService {
     public CategoryDto saveAndUpdateCategory(CategoryDto unsavedCategory) {
         log.info("Unsaved category {}", unsavedCategory);
         Category newCategory = categoryMapper.mapToEntity(unsavedCategory);
-        String userId = userContext.getUserId().orElse("Anonymous");
+        String userId = userContext.getUserId();
         newCategory.setUserId(userId);
         Category savedCategory = categoryRepository.save(newCategory);
         log.info("Saved category {}", savedCategory);
@@ -54,7 +54,7 @@ public class CategoryService {
 
     @Transactional
     public void deleteCategoryById(Long id) {
-        String userId = userContext.getUserId().orElse("Anonymous");
+        String userId = userContext.getUserId();
         categoryRepository.deleteCategoryByIdAndUserId(id, userId);
         log.info("Category with id {} is deleted", id);
     }

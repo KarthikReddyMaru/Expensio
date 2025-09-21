@@ -9,15 +9,33 @@ import org.springframework.stereotype.Component;
 @Component
 public class BudgetDefinitionMapper implements BiMapper<BudgetDefinitionDto, BudgetDefinition> {
 
-    private final BudgetCycleMapper cycleMapper = new BudgetCycleMapper();
-
     @Override
     public BudgetDefinition mapToEntity(BudgetDefinitionDto dto) {
         if (dto == null) return null;
-
         BudgetDefinition entity = new BudgetDefinition();
         entity.setId(dto.getId());
-        entity.setUserId(dto.getUserId());
+        return getBudgetDefinition(dto, entity);
+    }
+
+    @Override
+    public BudgetDefinitionDto mapToDto(BudgetDefinition entity) {
+        if (entity == null) return null;
+
+        BudgetDefinitionDto dto = new BudgetDefinitionDto();
+        dto.setId(entity.getId());
+        dto.setCategoryId(entity.getCategory() != null ? entity.getCategory().getId() : null);
+        dto.setBudgetAmount(entity.getBudgetAmount());
+        dto.setRecurrenceType(entity.getRecurrenceType());
+
+        return dto;
+    }
+
+    public BudgetDefinition mapToEntity(BudgetDefinitionDto dto, BudgetDefinition entity) {
+        if (dto == null) return null;
+        return getBudgetDefinition(dto, entity);
+    }
+
+    private static BudgetDefinition getBudgetDefinition(BudgetDefinitionDto dto, BudgetDefinition entity) {
         if (dto.getCategoryId() != null) {
             Category cat = new Category();
             cat.setId(dto.getCategoryId());
@@ -27,19 +45,5 @@ public class BudgetDefinitionMapper implements BiMapper<BudgetDefinitionDto, Bud
         entity.setRecurrenceType(dto.getRecurrenceType());
 
         return entity;
-    }
-
-    @Override
-    public BudgetDefinitionDto mapToDto(BudgetDefinition entity) {
-        if (entity == null) return null;
-
-        BudgetDefinitionDto dto = new BudgetDefinitionDto();
-        dto.setId(entity.getId());
-        dto.setUserId(entity.getUserId());
-        dto.setCategoryId(entity.getCategory() != null ? entity.getCategory().getId() : null);
-        dto.setBudgetAmount(entity.getBudgetAmount());
-        dto.setRecurrenceType(entity.getRecurrenceType());
-
-        return dto;
     }
 }

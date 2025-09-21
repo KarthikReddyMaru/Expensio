@@ -34,7 +34,7 @@ public class TransactionService {
 
     @SneakyThrows
     public TransactionDto getTransactionById(UUID transactionId) {
-        String userId = userContext.getUserId().orElse("Anonymous");
+        String userId = userContext.getUserId();
         Optional<Transaction> transaction = transactionRepository.findTransactionByIdAndUserId(transactionId, userId);
         Transaction data = transaction.orElseThrow(NoTransactionFoundException::new);
         return transactionMapper.mapToDto(data);
@@ -44,7 +44,7 @@ public class TransactionService {
 
         Sort sort = Sort.by("transactionDateTime").descending();
         Pageable pageRequest = PageRequest.of(pageNum, pageSize, sort);
-        String userId = userContext.getUserId().orElse("Anonymous");
+        String userId = userContext.getUserId();
         List<Transaction> transactions = transactionRepository.findTransactionsByUserId(userId, pageRequest);
         return transactions.stream().map(transactionMapper::mapToDto).toList();
     }
@@ -52,17 +52,17 @@ public class TransactionService {
     @Transactional
     public TransactionDto saveOrUpdateTransaction(TransactionDto unsavedTransaction) {
         Transaction transaction = transactionMapper.mapToEntity(unsavedTransaction);
-        String userId = userContext.getUserId().orElse("Anonymous");
+        String userId = userContext.getUserId();
         transaction.setUserId(userId);
         Transaction savedTransaction = transactionRepository.save(transaction);
-        log.info("Transaction of {} saved with id {}", userContext.getUserName().orElse("Anonymous"), savedTransaction.getId());
+        log.info("Transaction of {} saved with id {}", userContext.getUserName(), savedTransaction.getId());
         return transactionMapper.mapToDto(savedTransaction);
     }
 
     @Transactional
     public void deleteTransaction(UUID transactionId) {
-        String userId = userContext.getUserId().orElse("Anonymous");
-        log.info("Transaction of {} is deleted with id {}", userContext.getUserName().orElse("Anonymous"), transactionId);
+        String userId = userContext.getUserId();
+        log.info("Transaction of {} is deleted with id {}", userContext.getUserName(), transactionId);
         transactionRepository.deleteByIdAndUserId(transactionId, userId);
     }
 

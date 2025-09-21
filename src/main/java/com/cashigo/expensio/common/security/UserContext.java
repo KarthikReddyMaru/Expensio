@@ -12,10 +12,10 @@ import java.util.Optional;
 @Component
 public class UserContext {
 
-    public Optional<String> getUserId() {
+    public String getUserId() {
         Jwt jwt = getAuthenticationToken();
         return Optional.ofNullable(jwt)
-                .map(JwtClaimAccessor::getSubject);
+                .map(JwtClaimAccessor::getSubject).orElse("Anonymous");
     }
 
     public Optional<String> getUserName() {

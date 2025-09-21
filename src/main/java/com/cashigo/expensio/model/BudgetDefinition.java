@@ -26,12 +26,14 @@ public class BudgetDefinition {
     private String userId;
 
     @ManyToOne
+    @JoinColumn(updatable = false)
     private Category category;
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal budgetAmount;
 
     @Enumerated(EnumType.STRING)
+    @Column(updatable = false, nullable = false)
     private Recurrence recurrenceType;
 
     @OneToMany(mappedBy = "budgetDefinition", cascade = CascadeType.ALL, orphanRemoval = true)
