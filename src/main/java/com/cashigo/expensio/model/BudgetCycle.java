@@ -1,0 +1,35 @@
+package com.cashigo.expensio.model;
+
+import jakarta.persistence.*;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.UUID;
+
+@Entity
+@Table(
+        indexes = {
+                @Index(name = "cycleStartDate_idx", columnList = "cycleStartDateTime"),
+                @Index(name = "cycleEndDate_idx", columnList = "cycleEndDateTime"),
+                @Index(name = "currentActiveCycle", columnList = "isActive")
+        }
+)
+public class BudgetCycle {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID budgetCycleId;
+
+    @ManyToOne
+    private BudgetDefinition budgetDefinition;
+
+    private Instant cycleStartDateTime;
+
+    private Instant cycleEndDateTime;
+
+    @Column(precision = 19, scale = 2)
+    private BigDecimal amountSpent = BigDecimal.ZERO;
+
+    private boolean isActive;
+
+}
