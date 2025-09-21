@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +41,9 @@ public class TransactionService {
     }
 
     public List<TransactionDto> getAllTransactionByUserId(int pageNum) {
-        Pageable pageRequest = PageRequest.of(pageNum, pageSize);
+
+        Sort sort = Sort.by("transactionDateTime").descending();
+        Pageable pageRequest = PageRequest.of(pageNum, pageSize, sort);
         String userId = userContext.getUserId().orElse("Anonymous");
         List<Transaction> transactions = transactionRepository.findTransactionsByUserId(userId, pageRequest);
         return transactions.stream().map(transactionMapper::mapToDto).toList();

@@ -32,7 +32,7 @@ public class Transaction {
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 
-    @OneToOne
+    @ManyToOne
     private SubCategory subCategory;
 
     @Column(nullable = false)

@@ -18,10 +18,10 @@ public class TransactionSummaryController {
 
     private final TransactionSummaryService transactionSummaryService;
 
-    @GetMapping(params = {"userId", "pageNum"})
-    public ResponseEntity<Response<List<TransactionSummaryDto>>> getAllTransactionSummaryByUserId(String userId, int pageNum) {
+    @GetMapping(params = {"pageNum"})
+    public ResponseEntity<Response<List<TransactionSummaryDto>>> getAllTransactionSummaryByUserId(int pageNum) {
         Response<List<TransactionSummaryDto>> response = new Response<>();
-        List<TransactionSummaryDto> transactionSummary = transactionSummaryService.getAllTransactionSummaryByUserId(userId, pageNum);
+        List<TransactionSummaryDto> transactionSummary = transactionSummaryService.getAllTransactionSummaryByUserId(pageNum);
         response.setData(transactionSummary);
         return ResponseEntity.ok(response);
     }
