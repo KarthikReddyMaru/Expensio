@@ -1,6 +1,7 @@
 package com.cashigo.expensio.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -14,6 +15,7 @@ import java.util.UUID;
                 @Index(name = "currentActiveCycle", columnList = "isActive")
         }
 )
+@Data
 public class BudgetCycle {
 
     @Id

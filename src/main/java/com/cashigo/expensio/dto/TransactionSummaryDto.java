@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Data
-public class TransactionSummaryDto {
+public class TransactionSummaryDto implements Dto {
     private UUID id;
     private BigDecimal amount;
     private String category;

@@ -2,6 +2,7 @@ package com.cashigo.expensio.model;
 
 import com.cashigo.expensio.common.consts.Recurrence;
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.UUID;
                 @Index(name = "category_idx", columnList = "category")
         }
 )
+@Data
 public class BudgetDefinition {
 
     @Id
