@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,9 +32,7 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
-    private final SubCategoryService subCategoryService;
-    private final BudgetDefinitionService budgetDefinitionService;
-    private final BudgetCycleService budgetCycleService;
+    private final BudgetTrackingService budgetTrackingService;
     private final UserContext userContext;
 
     @Value("${page.size}")
@@ -48,12 +47,16 @@ public class TransactionService {
     }
 
     public List<TransactionDto> getAllTransactionByUserId(int pageNum) {
-
         Sort sort = Sort.by("transactionDateTime").descending();
         Pageable pageRequest = PageRequest.of(pageNum, pageSize, sort);
         String userId = userContext.getUserId();
         List<Transaction> transactions = transactionRepository.findTransactionsByUserId(userId, pageRequest);
         return transactions.stream().map(transactionMapper::mapToDto).toList();
+    }
+
+    public List<Transaction> getAllTransactionsBetweenDate(Instant startDateTime, Instant endDateTime) {
+        String userId = userContext.getUserId();
+        return transactionRepository.findTransactionsByUserIdAndTransactionDateTimeBetween(userId, startDateTime, endDateTime);
     }
 
     @Transactional
@@ -63,7 +66,7 @@ public class TransactionService {
         transaction.setUserId(userId);
         Transaction savedTransaction = transactionRepository.save(transaction);
         log.info("Transaction of {} saved with id {}", userContext.getUserName(), savedTransaction.getId());
-        addAmountSpentInCurrentBudgetCycle(savedTransaction.getSubCategory().getId(), savedTransaction.getAmount());
+        budgetTrackingService.addAmountSpentInCurrentBudgetCycle(savedTransaction.getSubCategory().getId(), savedTransaction.getAmount());
         return transactionMapper.mapToDto(savedTransaction);
     }
 
@@ -72,20 +75,6 @@ public class TransactionService {
         String userId = userContext.getUserId();
         log.info("Transaction of {} is deleted with id {}", userContext.getUserName(), transactionId);
         transactionRepository.deleteByIdAndUserId(transactionId, userId);
-    }
-
-    public void addAmountSpentInCurrentBudgetCycle(Long subCategoryId, BigDecimal amountSpent) {
-        SubCategoryDto subCategory = subCategoryService.getSubCategoryById(subCategoryId);
-        Long categoryId = subCategory.getCategoryId();
-        BudgetDefinition budgetDefinition = budgetDefinitionService.getBudgetDefinitionByCategoryAndUserId(categoryId);
-        if (budgetDefinition != null) {
-            UUID budgetDefinitionId = budgetDefinition.getId();
-            BudgetCycle activeCycle = budgetCycleService.getActiveBudgetCycleByBudgetDefinition(budgetDefinitionId);
-            BigDecimal amountSpentTillNow = activeCycle.getAmountSpent();
-            activeCycle.setAmountSpent(amountSpentTillNow.add(amountSpent));
-            budgetCycleService.saveBudgetCycleById(activeCycle);
-            log.info("Budget Amount updated for cycle ({})", activeCycle.getBudgetCycleId());
-        }
     }
 
 }

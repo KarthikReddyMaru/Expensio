@@ -3,11 +3,13 @@ package com.cashigo.expensio.service;
 import com.cashigo.expensio.common.consts.Recurrence;
 import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.BudgetDefinitionDto;
+import com.cashigo.expensio.dto.TransactionDto;
 import com.cashigo.expensio.dto.exception.NoBudgetDefinitionFoundException;
 import com.cashigo.expensio.dto.exception.NotValidRecurrenceException;
 import com.cashigo.expensio.dto.mapper.BudgetDefinitionMapper;
 import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.BudgetDefinition;
+import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.BudgetDefinitionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
@@ -40,6 +43,7 @@ public class BudgetDefinitionService {
     private final BudgetDefinitionRepository budgetDefinitionRepository;
     private final UserContext userContext;
     private final BudgetDefinitionMapper budgetDefinitionMapper;
+    private final BudgetTrackingService budgetTrackingService;
 
     public BudgetDefinitionDto getBudgetDefinitionById(UUID budgetDefinitionId) {
         String userId = userContext.getUserId();
@@ -92,6 +96,8 @@ public class BudgetDefinitionService {
                 newBudgetCycle = createCycle(cycleStartDate, zoneId, cycleEndDate, budgetDefinition);
             } else
                 throw new NotValidRecurrenceException();
+            BigDecimal amount = budgetTrackingService.addPreviousTransactionsAmountToCurrentBudgetCycle(newBudgetCycle);
+            newBudgetCycle.setAmountSpent(amount);
             budgetDefinition.setBudgetCycles(new ArrayList<>(List.of(newBudgetCycle)));
         }
         BudgetDefinition savedBudgetDefinition = budgetDefinitionRepository.save(budgetDefinition);
