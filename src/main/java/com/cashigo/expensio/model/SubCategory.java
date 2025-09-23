@@ -11,7 +11,7 @@ import java.time.Instant;
 @EntityListeners(AuditingEntityListener.class)
 @Table(
         indexes = {
-                @Index(name = "sub_category_name_idx", columnList = "name", unique = false),
+                @Index(name = "sub_category_name_idx", columnList = "name")
         }
 )
 @Data

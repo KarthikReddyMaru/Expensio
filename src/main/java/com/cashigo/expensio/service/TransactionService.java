@@ -1,9 +1,12 @@
 package com.cashigo.expensio.service;
 
 import com.cashigo.expensio.common.security.UserContext;
+import com.cashigo.expensio.dto.SubCategoryDto;
 import com.cashigo.expensio.dto.TransactionDto;
 import com.cashigo.expensio.dto.exception.NoTransactionFoundException;
 import com.cashigo.expensio.dto.mapper.TransactionMapper;
+import com.cashigo.expensio.model.BudgetCycle;
+import com.cashigo.expensio.model.BudgetDefinition;
 import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,6 +31,9 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
+    private final SubCategoryService subCategoryService;
+    private final BudgetDefinitionService budgetDefinitionService;
+    private final BudgetCycleService budgetCycleService;
     private final UserContext userContext;
 
     @Value("${page.size}")
@@ -56,6 +63,7 @@ public class TransactionService {
         transaction.setUserId(userId);
         Transaction savedTransaction = transactionRepository.save(transaction);
         log.info("Transaction of {} saved with id {}", userContext.getUserName(), savedTransaction.getId());
+        addAmountSpentInCurrentBudgetCycle(savedTransaction.getSubCategory().getId(), savedTransaction.getAmount());
         return transactionMapper.mapToDto(savedTransaction);
     }
 
@@ -64,6 +72,20 @@ public class TransactionService {
         String userId = userContext.getUserId();
         log.info("Transaction of {} is deleted with id {}", userContext.getUserName(), transactionId);
         transactionRepository.deleteByIdAndUserId(transactionId, userId);
+    }
+
+    public void addAmountSpentInCurrentBudgetCycle(Long subCategoryId, BigDecimal amountSpent) {
+        SubCategoryDto subCategory = subCategoryService.getSubCategoryById(subCategoryId);
+        Long categoryId = subCategory.getCategoryId();
+        BudgetDefinition budgetDefinition = budgetDefinitionService.getBudgetDefinitionByCategoryAndUserId(categoryId);
+        if (budgetDefinition != null) {
+            UUID budgetDefinitionId = budgetDefinition.getId();
+            BudgetCycle activeCycle = budgetCycleService.getActiveBudgetCycleByBudgetDefinition(budgetDefinitionId);
+            BigDecimal amountSpentTillNow = activeCycle.getAmountSpent();
+            activeCycle.setAmountSpent(amountSpentTillNow.add(amountSpent));
+            budgetCycleService.saveBudgetCycleById(activeCycle);
+            log.info("Budget Amount updated for cycle ({})", activeCycle.getBudgetCycleId());
+        }
     }
 
 }

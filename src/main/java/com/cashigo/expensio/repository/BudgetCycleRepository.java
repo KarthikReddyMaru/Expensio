@@ -24,6 +24,6 @@ public interface BudgetCycleRepository extends JpaRepository<BudgetCycle, UUID> 
     
     List<BudgetCycle> findBudgetCyclesByBudgetDefinition_Id(UUID budgetDefinitionId, Sort sort);
 
-    void deleteBudgetCycleByBudgetCycleIdAndBudgetDefinition_UserId(UUID budgetCycleId, String budgetDefinitionUserId);
-    
+    @Query("select c from BudgetCycle c where c.isActive = true and c.budgetDefinition.id = :budgetDefinitionId")
+    BudgetCycle findActiveBudgetCycleByBudgetDefinition_Id(UUID budgetDefinitionId);
 }

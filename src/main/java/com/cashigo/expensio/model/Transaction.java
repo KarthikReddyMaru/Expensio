@@ -33,6 +33,7 @@ public class Transaction {
     private BigDecimal amount;
 
     @ManyToOne
+    @JoinColumn(nullable = false)
     private SubCategory subCategory;
 
     @Column(nullable = false)

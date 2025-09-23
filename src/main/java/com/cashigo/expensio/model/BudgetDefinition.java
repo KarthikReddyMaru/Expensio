@@ -12,7 +12,7 @@ import java.util.UUID;
 @Table(
         indexes = {
                 @Index(name = "userId_idx", columnList = "userId"),
-                @Index(name = "category_idx", columnList = "category")
+                @Index(name = "category_idx", columnList = "category_id")
         }
 )
 @Data
@@ -26,7 +26,7 @@ public class BudgetDefinition {
     private String userId;
 
     @ManyToOne
-    @JoinColumn(updatable = false)
+    @JoinColumn(updatable = false, name = "category_id")
     private Category category;
 
     @Column(nullable = false, precision = 19, scale = 2)

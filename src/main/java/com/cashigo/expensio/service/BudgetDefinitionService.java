@@ -58,6 +58,13 @@ public class BudgetDefinitionService {
                 .stream().map(budgetDefinitionMapper::mapToDto).toList();
     }
 
+    public BudgetDefinition getBudgetDefinitionByCategoryAndUserId(Long categoryId) {
+        String userId = userContext.getUserId();
+        Optional<BudgetDefinition> budgetDefinition =
+                budgetDefinitionRepository.findBudgetDefinitionByCategory_IdAndUserId(categoryId, userId);
+        return budgetDefinition.orElse(null);
+    }
+
     @Transactional
     public BudgetDefinitionDto saveOrUpdateBudgetDefinition(BudgetDefinitionDto unsavedBudgetDefinition) {
         String userId = userContext.getUserId();
@@ -73,17 +80,19 @@ public class BudgetDefinitionService {
         budgetDefinition.setUserId(userId);
         ZoneId zoneId = ZoneId.of(zone);
         LocalDate now = LocalDate.now(zoneId);
+        BudgetCycle newBudgetCycle;
         if (budgetDefinition.getId() == null) {
             if (budgetDefinition.getRecurrenceType().equals(Recurrence.WEEKLY)) {
                 LocalDate cycleStartDate = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-                LocalDate cycleEndDate = now.with(TemporalAdjusters.next(DayOfWeek.SUNDAY));
-                createCycle(cycleStartDate, zoneId, cycleEndDate, budgetDefinition);
+                LocalDate cycleEndDate = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+                newBudgetCycle = createCycle(cycleStartDate, zoneId, cycleEndDate, budgetDefinition);
             } else if (budgetDefinition.getRecurrenceType().equals(Recurrence.MONTHLY)) {
                 LocalDate cycleStartDate = now.with(TemporalAdjusters.firstDayOfMonth());
                 LocalDate cycleEndDate = now.with(TemporalAdjusters.lastDayOfMonth());
-                createCycle(cycleStartDate, zoneId, cycleEndDate, budgetDefinition);
+                newBudgetCycle = createCycle(cycleStartDate, zoneId, cycleEndDate, budgetDefinition);
             } else
                 throw new NotValidRecurrenceException();
+            budgetDefinition.setBudgetCycles(new ArrayList<>(List.of(newBudgetCycle)));
         }
         BudgetDefinition savedBudgetDefinition = budgetDefinitionRepository.save(budgetDefinition);
         return budgetDefinitionMapper.mapToDto(savedBudgetDefinition);
@@ -96,7 +105,7 @@ public class BudgetDefinitionService {
         log.info("Budget definition of {} with id {}", userContext.getUserName(), budgetDefinitionId);
     }
 
-    private static void createCycle(LocalDate cycleStartDate, ZoneId zoneId, LocalDate cycleEndDate, BudgetDefinition budgetDefinition) {
+    public BudgetCycle createCycle(LocalDate cycleStartDate, ZoneId zoneId, LocalDate cycleEndDate, BudgetDefinition budgetDefinition) {
         Instant cycleStartInstant = cycleStartDate.atStartOfDay(zoneId).toInstant();
         Instant cycleEndInstant = cycleEndDate.atTime(LocalTime.MAX).atZone(zoneId).toInstant().truncatedTo(ChronoUnit.SECONDS);
         BudgetCycle budgetCycle = new BudgetCycle();
@@ -104,6 +113,6 @@ public class BudgetDefinitionService {
         budgetCycle.setBudgetDefinition(budgetDefinition);
         budgetCycle.setCycleStartDateTime(cycleStartInstant);
         budgetCycle.setCycleEndDateTime(cycleEndInstant);
-        budgetDefinition.setBudgetCycles(new ArrayList<>(List.of(budgetCycle)));
+        return budgetCycle;
     }
 }

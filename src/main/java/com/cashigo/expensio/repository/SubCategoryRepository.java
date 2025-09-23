@@ -15,7 +15,7 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Long> 
     List<SubCategory> findSubCategoriesByCategoryIdAndUserIdOrSystem(Long categoryId, String userId);
 
     @Query("select s from SubCategory s where s.id = :id and (s.category.userId = :userId or s.isSystem = true)")
-    Optional<SubCategory> findSubCategoryByIdAndUserIdOrSystem(Long id, String categoryUserId);
+    Optional<SubCategory> findSubCategoryByIdAndUserIdOrSystem(Long id, String userId);
 
     void deleteSubCategoryByIdAndCategory_UserId(Long id, String categoryUserId);
 
