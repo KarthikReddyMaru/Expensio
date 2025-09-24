@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
-public class BudgetCycleDto implements Dto {
+public class BudgetCycleDto {
     private UUID budgetCycleId;
     private UUID budgetDefinitionId;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

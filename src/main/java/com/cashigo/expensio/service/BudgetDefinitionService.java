@@ -1,15 +1,13 @@
 package com.cashigo.expensio.service;
 
-import com.cashigo.expensio.common.consts.Recurrence;
+import com.cashigo.expensio.common.consts.BudgetRecurrence;
 import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.BudgetDefinitionDto;
-import com.cashigo.expensio.dto.TransactionDto;
 import com.cashigo.expensio.dto.exception.NoBudgetDefinitionFoundException;
 import com.cashigo.expensio.dto.exception.NotValidRecurrenceException;
 import com.cashigo.expensio.dto.mapper.BudgetDefinitionMapper;
 import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.BudgetDefinition;
-import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.BudgetDefinitionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,13 +60,6 @@ public class BudgetDefinitionService {
                 .stream().map(budgetDefinitionMapper::mapToDto).toList();
     }
 
-    public BudgetDefinition getBudgetDefinitionByCategoryAndUserId(Long categoryId) {
-        String userId = userContext.getUserId();
-        Optional<BudgetDefinition> budgetDefinition =
-                budgetDefinitionRepository.findBudgetDefinitionByCategory_IdAndUserId(categoryId, userId);
-        return budgetDefinition.orElse(null);
-    }
-
     @Transactional
     public BudgetDefinitionDto saveOrUpdateBudgetDefinition(BudgetDefinitionDto unsavedBudgetDefinition) {
         String userId = userContext.getUserId();
@@ -86,11 +77,11 @@ public class BudgetDefinitionService {
         LocalDate now = LocalDate.now(zoneId);
         BudgetCycle newBudgetCycle;
         if (budgetDefinition.getId() == null) {
-            if (budgetDefinition.getRecurrenceType().equals(Recurrence.WEEKLY)) {
+            if (budgetDefinition.getBudgetRecurrenceType().equals(BudgetRecurrence.WEEKLY)) {
                 LocalDate cycleStartDate = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
                 LocalDate cycleEndDate = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
                 newBudgetCycle = createCycle(cycleStartDate, zoneId, cycleEndDate, budgetDefinition);
-            } else if (budgetDefinition.getRecurrenceType().equals(Recurrence.MONTHLY)) {
+            } else if (budgetDefinition.getBudgetRecurrenceType().equals(BudgetRecurrence.MONTHLY)) {
                 LocalDate cycleStartDate = now.with(TemporalAdjusters.firstDayOfMonth());
                 LocalDate cycleEndDate = now.with(TemporalAdjusters.lastDayOfMonth());
                 newBudgetCycle = createCycle(cycleStartDate, zoneId, cycleEndDate, budgetDefinition);

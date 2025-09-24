@@ -41,6 +41,9 @@ public class Transaction {
 
     private String note;
 
+    @ManyToOne
+    private RecurringTransactionDefinition transactionDefinition;
+
     @CreatedDate
     @Column(updatable = false)
     private Instant createdAt;

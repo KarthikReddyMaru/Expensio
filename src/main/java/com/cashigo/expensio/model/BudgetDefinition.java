@@ -1,6 +1,6 @@
 package com.cashigo.expensio.model;
 
-import com.cashigo.expensio.common.consts.Recurrence;
+import com.cashigo.expensio.common.consts.BudgetRecurrence;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -34,7 +34,7 @@ public class BudgetDefinition {
 
     @Enumerated(EnumType.STRING)
     @Column(updatable = false, nullable = false)
-    private Recurrence recurrenceType;
+    private BudgetRecurrence budgetRecurrenceType;
 
     @OneToMany(mappedBy = "budgetDefinition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BudgetCycle> budgetCycles;

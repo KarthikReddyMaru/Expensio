@@ -1,6 +1,6 @@
 package com.cashigo.expensio.repository;
 
-import com.cashigo.expensio.common.consts.Recurrence;
+import com.cashigo.expensio.common.consts.BudgetRecurrence;
 import com.cashigo.expensio.model.BudgetDefinition;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,7 +19,7 @@ public interface BudgetDefinitionRepository extends JpaRepository<BudgetDefiniti
     
     List<BudgetDefinition> findBudgetDefinitionsByUserId(String userId, Pageable pageable);
 
-    List<BudgetDefinition> findBudgetDefinitionsByRecurrenceType(Recurrence recurrenceType);
+    List<BudgetDefinition> findBudgetDefinitionsByBudgetRecurrenceType(BudgetRecurrence budgetRecurrenceType);
 
     void deleteBudgetDefinitionByIdAndUserId(UUID id, String userId);
     

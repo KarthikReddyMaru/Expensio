@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubCategoryDto implements Dto {
+public class SubCategoryDto {
     private Long id;
     private String name;
     private boolean isSystem;
