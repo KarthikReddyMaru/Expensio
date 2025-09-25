@@ -42,7 +42,12 @@ public class Transaction {
     private String note;
 
     @ManyToOne
+    @JoinColumn(updatable = false)
     private RecurringTransactionDefinition transactionDefinition;
+
+    @ManyToOne
+    @JoinColumn
+    private BudgetCycle budgetCycle;
 
     @CreatedDate
     @Column(updatable = false)

@@ -1,11 +1,13 @@
 package com.cashigo.expensio.repository;
 
+import com.cashigo.expensio.model.SubCategory;
 import com.cashigo.expensio.model.Transaction;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,7 +17,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
     Optional<Transaction> findTransactionByIdAndUserId(UUID id, String userId);
 
-    List<Transaction> findTransactionsByUserIdAndTransactionDateTimeBetween(String userId, Instant transactionDateTimeAfter, Instant transactionDateTimeBefore);
+    List<Transaction> findTransactionsByUserIdAndSubCategory_IsInAndTransactionDateTimeBetween(String userId, Collection<SubCategory> subCategories, Instant transactionDateTimeAfter, Instant transactionDateTimeBefore);
 
     List<Transaction> findTransactionsByUserId(String userId, Pageable pageable);
 

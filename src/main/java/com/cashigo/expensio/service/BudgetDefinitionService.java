@@ -87,8 +87,8 @@ public class BudgetDefinitionService {
                 newBudgetCycle = createCycle(cycleStartDate, zoneId, cycleEndDate, budgetDefinition);
             } else
                 throw new NotValidRecurrenceException();
-            BigDecimal amount = budgetTrackingService.addPreviousTransactionsAmountToCurrentBudgetCycle(newBudgetCycle);
-            newBudgetCycle.setAmountSpent(amount);
+            Long categoryId = budgetDefinition.getCategory().getId();
+            budgetTrackingService.addPreviousTransactionsToCurrentBudgetCycle(newBudgetCycle, categoryId);
             budgetDefinition.setBudgetCycles(new ArrayList<>(List.of(newBudgetCycle)));
         }
         BudgetDefinition savedBudgetDefinition = budgetDefinitionRepository.save(budgetDefinition);

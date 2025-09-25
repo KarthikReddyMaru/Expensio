@@ -3,8 +3,8 @@ package com.cashigo.expensio.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -29,9 +29,9 @@ public class BudgetCycle {
 
     private Instant cycleEndDateTime;
 
-    @Column(precision = 19, scale = 2)
-    private BigDecimal amountSpent = BigDecimal.ZERO;
-
     private boolean isActive;
+
+    @OneToMany(mappedBy = "budgetCycle")
+    private List<Transaction> transactions;
 
 }

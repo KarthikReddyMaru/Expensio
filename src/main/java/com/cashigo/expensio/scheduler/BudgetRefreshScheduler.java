@@ -32,7 +32,7 @@ public class BudgetRefreshScheduler {
     @Value("${zone.id}")
     private String zone;
 
-    @Scheduled(cron = "0 */2 * * * *")
+//    @Scheduled(cron = "0 */2 * * * *")
     @Transactional
     public void refreshWeeklyCycles() {
         log.info("Scheduler starts...");

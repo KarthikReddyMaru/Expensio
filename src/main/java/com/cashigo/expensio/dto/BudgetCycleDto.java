@@ -16,7 +16,6 @@ public class BudgetCycleDto {
     private LocalDate cycleStartDateTime; // LocalDate for readability
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDate cycleEndDateTime;
-    private BigDecimal amountSpent;
     private boolean isActive;
 }
 

@@ -28,7 +28,6 @@ public class BudgetCycleMapper implements BiMapper<BudgetCycleDto, BudgetCycle> 
             entity.setBudgetDefinition(budgetDef);
         }
 
-        entity.setAmountSpent(dto.getAmountSpent());
         entity.setActive(dto.isActive());
 
         return entity;
@@ -48,7 +47,6 @@ public class BudgetCycleMapper implements BiMapper<BudgetCycleDto, BudgetCycle> 
         dto.setCycleStartDateTime(cycleStartDate);
         dto.setCycleEndDateTime(cycleEndDate);
 
-        dto.setAmountSpent(entity.getAmountSpent());
         dto.setActive(entity.isActive());
 
         return dto;

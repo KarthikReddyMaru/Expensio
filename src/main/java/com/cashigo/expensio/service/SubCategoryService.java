@@ -30,6 +30,11 @@ public class SubCategoryService {
         return subCategories.stream().map(subCategoryMapper::mapToDto).toList();
     }
 
+    public List<SubCategory> getSubCategoryEntities(Long categoryId) {
+        String userId = userContext.getUserId();
+        return subCategoryRepository.findSubCategoriesByCategoryIdAndUserIdOrSystem(categoryId, userId);
+    }
+
     @SneakyThrows
     public SubCategoryDto getSubCategoryById(Long subCategoryId) {
         String userId = userContext.getUserId();

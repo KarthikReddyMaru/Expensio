@@ -5,6 +5,8 @@ import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.TransactionDto;
 import com.cashigo.expensio.dto.exception.NoTransactionFoundException;
 import com.cashigo.expensio.dto.mapper.TransactionMapper;
+import com.cashigo.expensio.model.BudgetCycle;
+import com.cashigo.expensio.model.RecurringTransactionDefinition;
 import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +30,8 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
-    private final BudgetTrackingService budgetTrackingService;
     private final RecurringTransactionService recurringTransactionService;
+    private final BudgetCycleService budgetCycleService;
     private final UserContext userContext;
 
     @Value("${page.size}")
@@ -56,12 +58,18 @@ public class TransactionService {
         Transaction transaction = transactionMapper.mapToEntity(unsavedTransaction);
         String userId = userContext.getUserId();
         transaction.setUserId(userId);
+        TransactionRecurrence transactionRecurrence = unsavedTransaction.getTransactionRecurrenceType();
+        if (transactionRecurrence != null && !transactionRecurrence.equals(TransactionRecurrence.NONE)) {
+            RecurringTransactionDefinition recurringTransactionDefinition =
+                    recurringTransactionService.createRecurringTransactionDefinition(transaction, transactionRecurrence);
+            transaction.setTransactionDefinition(recurringTransactionDefinition);
+        }
+        Long subCategoryId = transaction.getSubCategory().getId();
+        BudgetCycle budgetCycle = budgetCycleService.getActiveBudgetCycleBySubCategoryId(subCategoryId);
+        if (budgetCycle != null)
+            transaction.setBudgetCycle(budgetCycle);
         Transaction savedTransaction = transactionRepository.save(transaction);
         log.info("Transaction of {} saved with id {}", userContext.getUserName(), savedTransaction.getId());
-        budgetTrackingService.addAmountSpentInCurrentBudgetCycle(savedTransaction.getSubCategory().getId(), savedTransaction.getAmount());
-        TransactionRecurrence transactionRecurrence = unsavedTransaction.getTransactionRecurrenceType();
-        if (transactionRecurrence != null && !transactionRecurrence.equals(TransactionRecurrence.NONE))
-            recurringTransactionService.createRecurringTransactionDefinition(savedTransaction, transactionRecurrence);
         return transactionMapper.mapToDto(savedTransaction);
     }
 

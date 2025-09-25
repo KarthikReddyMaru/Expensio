@@ -29,6 +29,7 @@ public class RecurringTransactionDefinition {
     private SubCategory subCategory;
 
     @Column(nullable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
     private TransactionRecurrence transactionRecurrenceType;
 
     private Instant lastProcessedInstant;

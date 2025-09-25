@@ -26,7 +26,7 @@ public class RecurringTransactionService {
     private final RecurringTransactionDefinitionRepository transactionDefinitionRepository;
 
     @Transactional
-    public void createRecurringTransactionDefinition(Transaction transaction, TransactionRecurrence transactionRecurrence) {
+    public RecurringTransactionDefinition createRecurringTransactionDefinition(Transaction transaction, TransactionRecurrence transactionRecurrence) {
         RecurringTransactionDefinition recurringTransactionDefinition = mapToTransactionDefinition(transaction, transactionRecurrence);
         ZoneId zoneId = ZoneId.of(zone);
         Instant lastProcessedInstant = recurringTransactionDefinition.getLastProcessedInstant();
@@ -36,14 +36,14 @@ public class RecurringTransactionService {
             case WEEKLY -> nextOccurrence = lastProcessedInstant.atZone(zoneId).plusWeeks(1).toLocalDate();
         }
         recurringTransactionDefinition.setNextOccurrence(nextOccurrence);
-        transactionDefinitionRepository.save(recurringTransactionDefinition);
+        RecurringTransactionDefinition saved = transactionDefinitionRepository.save(recurringTransactionDefinition);
         log.info("Saved recurring transaction {}", recurringTransactionDefinition);
+        return saved;
     }
 
     private static RecurringTransactionDefinition mapToTransactionDefinition(Transaction transaction, TransactionRecurrence transactionRecurrence) {
         RecurringTransactionDefinition recurringTransactionDefinition = new RecurringTransactionDefinition();
         recurringTransactionDefinition.setAmount(transaction.getAmount());
-        recurringTransactionDefinition.setTransactions(new ArrayList<>(List.of(transaction)));
         recurringTransactionDefinition.setUserId(transaction.getUserId());
         recurringTransactionDefinition.setSubCategory(transaction.getSubCategory());
         recurringTransactionDefinition.setTransactionRecurrenceType(transactionRecurrence);
