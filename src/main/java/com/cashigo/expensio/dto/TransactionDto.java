@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -18,7 +19,7 @@ public class TransactionDto {
     private String userId;
     private BigDecimal amount;
     private Long subCategoryId;
-    private Instant transactionDateTime;
+    private LocalDateTime transactionDateTime;
     private String note;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private TransactionRecurrence transactionRecurrenceType;
