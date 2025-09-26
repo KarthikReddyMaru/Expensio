@@ -32,6 +32,7 @@ public class BudgetDefinitionService {
     private final BudgetDefinitionRepository budgetDefinitionRepository;
     private final BudgetCycleService budgetCycleService;
     private final BudgetDefinitionMapper budgetDefinitionMapper;
+    private final BudgetTrackingService budgetTrackingService;
     private final UserContext userContext;
 
     public BudgetDefinitionDto getBudgetDefinitionById(UUID budgetDefinitionId) {
@@ -53,9 +54,15 @@ public class BudgetDefinitionService {
         String userId = userContext.getUserId();
         BudgetDefinition budgetDefinition = budgetDefinitionMapper.mapToEntity(unsavedBudgetDefinition);
         budgetDefinition.setUserId(userId);
+
         BudgetCycle budgetCycle = budgetCycleService.createBudgetCycle(budgetDefinition);
         budgetDefinition.setBudgetCycles(new ArrayList<>(List.of(budgetCycle)));
+
         budgetDefinitionRepository.save(budgetDefinition);
+
+        Long categoryId = budgetDefinition.getCategory().getId();
+        budgetTrackingService.addPreviousTransactionsToCurrentBudgetCycle(budgetCycle, categoryId);
+
         return budgetDefinitionMapper.mapToDto(budgetDefinition);
     }
 

@@ -15,6 +15,7 @@ import java.util.UUID;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
+    @Query("select t from Transaction t where t.id = :id and t.userId = :userid")
     Optional<Transaction> findTransactionById(UUID id, String userId);
 
     @Query("""
@@ -27,7 +28,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             String userId, List<Long> subCategoryIds, Instant start, Instant end);
 
     @Query(
-            value = "select distinct t from Transaction t join fetch t.subCategory where t.userId = :userId",
+            value = "select distinct t from Transaction t join fetch t.subCategory sc join fetch sc.category where t.userId = :userId",
             countQuery = "select count(t) from Transaction t where t.userId = :userId"
     )
     Page<Transaction> findTransactionsByWithSubCategory(String userId, Pageable pageable);

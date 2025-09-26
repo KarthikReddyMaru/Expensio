@@ -53,7 +53,10 @@ public class BudgetCycleService {
         Long categoryId = subCategory.getCategoryId();
         BudgetDefinition budgetDefinition = budgetDefinitionRepository
                 .findBudgetDefinitionByCategoryWithCycles(categoryId, userId)
-                .orElseThrow(NoBudgetDefinitionFoundException::new);
+                .orElse(null);
+
+        if (budgetDefinition == null) return null;
+
         return budgetDefinition
                 .getBudgetCycles()
                 .stream()
