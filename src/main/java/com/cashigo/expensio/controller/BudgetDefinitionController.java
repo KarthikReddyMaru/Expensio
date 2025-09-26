@@ -39,7 +39,7 @@ public class BudgetDefinitionController {
     public ResponseEntity<Response<BudgetDefinitionDto>> saveBudgetDefinition(
             @Valid @RequestBody BudgetDefinitionDto budgetDefinitionDto) {
         Response<BudgetDefinitionDto> response = new Response<>();
-        BudgetDefinitionDto budgetDefinition = budgetDefinitionService.saveOrUpdateBudgetDefinition(budgetDefinitionDto);
+        BudgetDefinitionDto budgetDefinition = budgetDefinitionService.saveBudgetDefinition(budgetDefinitionDto);
         response.setData(budgetDefinition);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -48,7 +48,7 @@ public class BudgetDefinitionController {
     public ResponseEntity<Response<BudgetDefinitionDto>> updateBudgetDefinition(
             @Valid @RequestBody BudgetDefinitionDto budgetDefinitionDto) {
         Response<BudgetDefinitionDto> response = new Response<>();
-        BudgetDefinitionDto budgetDefinition = budgetDefinitionService.saveOrUpdateBudgetDefinition(budgetDefinitionDto);
+        BudgetDefinitionDto budgetDefinition = budgetDefinitionService.updateBudgetDefinition(budgetDefinitionDto);
         response.setData(budgetDefinition);
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }

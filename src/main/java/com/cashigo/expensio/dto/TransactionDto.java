@@ -16,7 +16,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class TransactionDto {
     private UUID id;
-    private String userId;
     private BigDecimal amount;
     private Long subCategoryId;
     private LocalDateTime transactionDateTime;

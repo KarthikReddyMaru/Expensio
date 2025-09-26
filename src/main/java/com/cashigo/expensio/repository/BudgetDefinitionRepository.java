@@ -16,14 +16,19 @@ public interface BudgetDefinitionRepository extends JpaRepository<BudgetDefiniti
 
     Optional<BudgetDefinition> findBudgetDefinitionByIdAndUserId(UUID id, String userId);
 
-    Optional<BudgetDefinition> findBudgetDefinitionByCategory_IdAndUserId(Long categoryId, String userId);
+    @Query("select distinct bd from BudgetDefinition bd join fetch bd.budgetCycles where bd.userId = :userId and bd.category.id = :categoryId")
+    Optional<BudgetDefinition> findBudgetDefinitionByCategoryWithCycles(Long categoryId, String userId);
 
     List<BudgetDefinition> findBudgetDefinitionsByUserId(String userId);
 
-    List<BudgetDefinition> findBudgetDefinitionsByBudgetRecurrenceType(BudgetRecurrence budgetRecurrenceType);
+    @Query("select distinct bd from BudgetDefinition bd join fetch bd.budgetCycles where bd.budgetRecurrenceType = :budgetRecurrenceType")
+    List<BudgetDefinition> findBudgetDefinitionsByBudgetRecurrenceTypeWithCycles(BudgetRecurrence budgetRecurrenceType);
 
     @Query("select distinct bd from BudgetDefinition bd join fetch bd.budgetCycles where bd.userId = :userId")
     List<BudgetDefinition> findUserBudgetDefinitionsWithCycles(String userId);
+
+    @Query("select distinct bd from BudgetDefinition bd join fetch bd.budgetCycles where bd.userId = :userId and bd.id = :id")
+    Optional<BudgetDefinition> findBudgetDefinitionByIdWithCycles(UUID id, String userId);
 
     void deleteBudgetDefinitionByIdAndUserId(UUID id, String userId);
     

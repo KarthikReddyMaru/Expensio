@@ -2,7 +2,7 @@ package com.cashigo.expensio.service;
 
 import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.CategoryDto;
-import com.cashigo.expensio.dto.exception.CategoryNotFoundException;
+import com.cashigo.expensio.dto.exception.NoCategoryFoundException;
 import com.cashigo.expensio.dto.mapper.CategoryMapper;
 import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.repository.CategoryRepository;
@@ -35,8 +35,8 @@ public class CategoryService {
     @SneakyThrows
     public CategoryDto getCategoryById(Long id) {
         String userId = userContext.getUserId();
-        Optional<Category> category = categoryRepository.findCategoryByIdAndUserIdOrSystem(id, userId);
-        Category data = category.orElseThrow(CategoryNotFoundException::new);
+        Optional<Category> category = categoryRepository.findCategoryByIdWithSubCategories(id, userId);
+        Category data = category.orElseThrow(NoCategoryFoundException::new);
         return categoryMapper.mapToDto(data);
     }
 

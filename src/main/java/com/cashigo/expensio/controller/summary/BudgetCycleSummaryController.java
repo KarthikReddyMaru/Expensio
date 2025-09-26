@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/budgetcycle/summary")
+@RequestMapping("summary/budgetcycle")
 @RequiredArgsConstructor
 public class BudgetCycleSummaryController {
 

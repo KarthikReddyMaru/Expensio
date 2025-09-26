@@ -37,7 +37,7 @@ public class TransactionController {
     @PostMapping
     public ResponseEntity<Response<TransactionDto>> saveTransaction(@RequestBody TransactionDto transactionDto) {
         Response<TransactionDto> response = new Response<>();
-        TransactionDto savedTransactionDto = transactionService.saveOrUpdateTransaction(transactionDto);
+        TransactionDto savedTransactionDto = transactionService.saveTransaction(transactionDto);
         response.setData(savedTransactionDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -45,7 +45,7 @@ public class TransactionController {
     @PutMapping
     public ResponseEntity<Response<TransactionDto>> updateTransaction(@RequestBody TransactionDto transactionDto) {
         Response<TransactionDto> response = new Response<>();
-        TransactionDto savedTransactionDto = transactionService.saveOrUpdateTransaction(transactionDto);
+        TransactionDto savedTransactionDto = transactionService.updateTransaction(transactionDto);
         response.setData(savedTransactionDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

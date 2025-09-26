@@ -36,9 +36,7 @@ public class RecurringTransactionService {
             case WEEKLY -> nextOccurrence = lastProcessedInstant.atZone(zoneId).plusWeeks(1).toLocalDate();
         }
         recurringTransactionDefinition.setNextOccurrence(nextOccurrence);
-        RecurringTransactionDefinition saved = transactionDefinitionRepository.save(recurringTransactionDefinition);
-        log.info("Saved recurring transaction {}", recurringTransactionDefinition);
-        return saved;
+        return transactionDefinitionRepository.save(recurringTransactionDefinition);
     }
 
     private static RecurringTransactionDefinition mapToTransactionDefinition(Transaction transaction, TransactionRecurrence transactionRecurrence) {

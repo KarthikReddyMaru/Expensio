@@ -13,11 +13,11 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    @Query("select c from Category c where c.userId = :userId or c.isSystem = true ")
+    @Query("select distinct c from Category c join fetch c.subCategories where c.userId = :userId or c.isSystem = true ")
     List<Category> findCategoriesByUserIdOrSystem(@Param("userId") String userId, Sort sort);
 
-    @Query("select c from Category c where c.id = :id and (c.userId = :userId or c.isSystem = true )")
-    Optional<Category> findCategoryByIdAndUserIdOrSystem(Long id, String userId);
+    @Query("select c from Category c join fetch c.subCategories where c.id = :id and (c.userId = :userId or c.isSystem = true )")
+    Optional<Category> findCategoryByIdWithSubCategories(Long id, String userId);
 
     void deleteCategoryByIdAndUserId(Long id, String userId);
 }

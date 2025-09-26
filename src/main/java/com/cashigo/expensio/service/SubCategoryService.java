@@ -2,9 +2,12 @@ package com.cashigo.expensio.service;
 
 import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.SubCategoryDto;
+import com.cashigo.expensio.dto.exception.NoCategoryFoundException;
 import com.cashigo.expensio.dto.exception.NoSubCategoryFoundException;
 import com.cashigo.expensio.dto.mapper.SubCategoryMapper;
+import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.model.SubCategory;
+import com.cashigo.expensio.repository.CategoryRepository;
 import com.cashigo.expensio.repository.SubCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -21,24 +24,33 @@ import java.util.Optional;
 public class SubCategoryService {
 
     private final SubCategoryRepository subCategoryRepository;
+    private final CategoryRepository categoryRepository;
     private final SubCategoryMapper subCategoryMapper;
     private final UserContext userContext;
 
+    @SneakyThrows
     public List<SubCategoryDto> getSubCategories(Long categoryId) {
         String userId = userContext.getUserId();
-        List<SubCategory> subCategories = subCategoryRepository.findSubCategoriesByCategoryIdAndUserIdOrSystem(categoryId, userId);
+        Category category = categoryRepository
+                .findCategoryByIdWithSubCategories(categoryId, userId)
+                .orElseThrow(NoCategoryFoundException::new);
+        List<SubCategory> subCategories = category.getSubCategories();
         return subCategories.stream().map(subCategoryMapper::mapToDto).toList();
     }
 
+    @SneakyThrows
     public List<SubCategory> getSubCategoryEntities(Long categoryId) {
         String userId = userContext.getUserId();
-        return subCategoryRepository.findSubCategoriesByCategoryIdAndUserIdOrSystem(categoryId, userId);
+        Category category = categoryRepository
+                .findCategoryByIdWithSubCategories(categoryId, userId)
+                .orElseThrow(NoCategoryFoundException::new);
+        return category.getSubCategories();
     }
 
     @SneakyThrows
     public SubCategoryDto getSubCategoryById(Long subCategoryId) {
         String userId = userContext.getUserId();
-        Optional<SubCategory> subCategory = subCategoryRepository.findSubCategoryByIdAndUserIdOrSystem(subCategoryId, userId);
+        Optional<SubCategory> subCategory = subCategoryRepository.findSubCategoryById(subCategoryId, userId);
         SubCategory data = subCategory.orElseThrow(NoSubCategoryFoundException::new);
         return subCategoryMapper.mapToDto(data);
     }

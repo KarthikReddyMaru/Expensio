@@ -1,7 +1,7 @@
 package com.cashigo.expensio.dto.exception.handler;
 
 import com.cashigo.expensio.dto.ErrorResponse;
-import com.cashigo.expensio.dto.exception.CategoryNotFoundException;
+import com.cashigo.expensio.dto.exception.NoCategoryFoundException;
 import com.cashigo.expensio.dto.mapper.ErrorResponseMapper;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.StaleObjectStateException;
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RequiredArgsConstructor
 public class CategoryExceptionHandler {
 
-    @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<ErrorResponse> categoryNotFound(CategoryNotFoundException exception) {
+    @ExceptionHandler(NoCategoryFoundException.class)
+    public ResponseEntity<ErrorResponse> categoryNotFound(NoCategoryFoundException exception) {
         ErrorResponse errorResponse = ErrorResponseMapper.fromException(exception, HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }

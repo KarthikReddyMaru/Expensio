@@ -23,7 +23,6 @@ public class TransactionMapper implements BiMapper<TransactionDto, Transaction> 
 
         Transaction transaction = new Transaction();
         transaction.setId(dto.getId());
-        transaction.setUserId(dto.getUserId());
         transaction.setAmount(dto.getAmount());
         transaction.setNote(dto.getNote());
 
@@ -45,7 +44,6 @@ public class TransactionMapper implements BiMapper<TransactionDto, Transaction> 
 
         TransactionDto dto = new TransactionDto();
         dto.setId(entity.getId());
-        dto.setUserId(entity.getUserId());
         dto.setAmount(entity.getAmount());
         dto.setNote(entity.getNote());
 

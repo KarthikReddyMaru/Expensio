@@ -14,7 +14,14 @@ public class BudgetDefinitionMapper implements BiMapper<BudgetDefinitionDto, Bud
         if (dto == null) return null;
         BudgetDefinition entity = new BudgetDefinition();
         entity.setId(dto.getId());
-        return getBudgetDefinition(dto, entity);
+        if (dto.getCategoryId() != null) {
+            Category cat = new Category();
+            cat.setId(dto.getCategoryId());
+            entity.setCategory(cat);
+        }
+        entity.setBudgetAmount(dto.getBudgetAmount());
+        entity.setBudgetRecurrenceType(dto.getBudgetRecurrenceType());
+        return entity;
     }
 
     @Override
@@ -30,20 +37,5 @@ public class BudgetDefinitionMapper implements BiMapper<BudgetDefinitionDto, Bud
         return dto;
     }
 
-    public BudgetDefinition mapToEntity(BudgetDefinitionDto dto, BudgetDefinition entity) {
-        if (dto == null) return null;
-        return getBudgetDefinition(dto, entity);
-    }
 
-    private static BudgetDefinition getBudgetDefinition(BudgetDefinitionDto dto, BudgetDefinition entity) {
-        if (dto.getCategoryId() != null) {
-            Category cat = new Category();
-            cat.setId(dto.getCategoryId());
-            entity.setCategory(cat);
-        }
-        entity.setBudgetAmount(dto.getBudgetAmount());
-        entity.setBudgetRecurrenceType(dto.getBudgetRecurrenceType());
-
-        return entity;
-    }
 }

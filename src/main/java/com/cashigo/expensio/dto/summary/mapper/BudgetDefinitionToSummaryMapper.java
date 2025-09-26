@@ -21,12 +21,21 @@ public class BudgetDefinitionToSummaryMapper implements Mapper<BudgetDefinition,
         dto.setBudgetRecurrenceType(entity.getBudgetRecurrenceType().name());
 
         if (entity.getBudgetCycles() != null) {
+
             dto.setBudgetCycles(
                     entity.getBudgetCycles()
                             .stream()
                             .map(BudgetCycle::getId)
                             .toList()
             );
+
+            entity.getBudgetCycles()
+                    .stream()
+                    .filter(BudgetCycle::isActive)
+                    .findFirst()
+                    .ifPresent(
+                            activeBudgetCycle -> dto.setActiveCycle(activeBudgetCycle.getId())
+                    );
         }
 
         return dto;

@@ -31,7 +31,7 @@ public class BudgetCycleSummaryService {
 
     public BigDecimal getAmountSpentInCycle(UUID budgetCycleId) {
         BudgetCycle transactions = budgetCycleRepository
-                .findById(budgetCycleId)
+                .findTransactionsByCycleId(budgetCycleId)
                 .orElseThrow(NoBudgetCycleFoundException::new);
         return transactions
                 .getTransactions()

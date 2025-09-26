@@ -4,9 +4,7 @@ import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.exception.NoBudgetDefinitionFoundException;
 import com.cashigo.expensio.dto.summary.BudgetDefinitionSummaryDto;
 import com.cashigo.expensio.dto.summary.mapper.BudgetDefinitionToSummaryMapper;
-import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.BudgetDefinition;
-import com.cashigo.expensio.repository.BudgetCycleRepository;
 import com.cashigo.expensio.repository.BudgetDefinitionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +18,6 @@ public class BudgetDefinitionSummaryService {
 
     private final BudgetDefinitionRepository budgetDefinitionRepository;
     private final BudgetDefinitionToSummaryMapper budgetDefinitionToSummaryMapper;
-    private final BudgetCycleRepository budgetCycleRepository;
     private final UserContext userContext;
 
     public List<BudgetDefinitionSummaryDto> getBudgetDefinitionSummaries() {
@@ -29,11 +26,6 @@ public class BudgetDefinitionSummaryService {
         return budgetDefinition
                 .stream()
                 .map(budgetDefinitionToSummaryMapper::map)
-                .peek(summary -> {
-                    UUID budgetDefinitionId = summary.getId();
-                    BudgetCycle activeCycle = budgetCycleRepository.findActiveBudgetCycleByBudgetDefinition_Id(budgetDefinitionId);
-                    summary.setActiveCycle(activeCycle.getId());
-                })
                 .toList();
     }
 
@@ -42,10 +34,7 @@ public class BudgetDefinitionSummaryService {
         BudgetDefinition budgetDefinition = budgetDefinitionRepository
                 .findBudgetDefinitionByIdAndUserId(budgetDefinitionId, userId)
                 .orElseThrow(NoBudgetDefinitionFoundException::new);
-        BudgetDefinitionSummaryDto summary = budgetDefinitionToSummaryMapper.map(budgetDefinition);
-        BudgetCycle activeCycle = budgetCycleRepository.findActiveBudgetCycleByBudgetDefinition_Id(budgetDefinitionId);
-        summary.setActiveCycle(activeCycle.getId());
-        return summary;
+        return budgetDefinitionToSummaryMapper.map(budgetDefinition);
     }
 
 }

@@ -7,6 +7,7 @@ import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,7 +30,7 @@ public class TransactionSummaryService {
         String userId = userContext.getUserId();
         Sort sort = Sort.by("transactionDateTime").descending();
         Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
-        List<Transaction> transactions = transactionRepository.findTransactionsByUserId(userId, pageable);
+        Page<Transaction> transactions = transactionRepository.findTransactionsByWithSubCategory(userId, pageable);
         return transactions.stream().map(transactionToSummaryMapper::map).toList();
     }
 

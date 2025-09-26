@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -40,7 +41,7 @@ public class TransactionService {
     @SneakyThrows
     public TransactionDto getTransactionById(UUID transactionId) {
         String userId = userContext.getUserId();
-        Optional<Transaction> transaction = transactionRepository.findTransactionByIdAndUserId(transactionId, userId);
+        Optional<Transaction> transaction = transactionRepository.findTransactionById(transactionId, userId);
         Transaction data = transaction.orElseThrow(NoTransactionFoundException::new);
         return transactionMapper.mapToDto(data);
     }
@@ -49,27 +50,35 @@ public class TransactionService {
         Sort sort = Sort.by("transactionDateTime").descending();
         Pageable pageRequest = PageRequest.of(pageNum, pageSize, sort);
         String userId = userContext.getUserId();
-        List<Transaction> transactions = transactionRepository.findTransactionsByUserId(userId, pageRequest);
+        Page<Transaction> transactions = transactionRepository.findTransactionsByWithSubCategory(userId, pageRequest);
         return transactions.stream().map(transactionMapper::mapToDto).toList();
     }
 
     @Transactional
-    public TransactionDto saveOrUpdateTransaction(TransactionDto unsavedTransaction) {
+    public TransactionDto saveTransaction(TransactionDto unsavedTransaction) {
+
         Transaction transaction = transactionMapper.mapToEntity(unsavedTransaction);
         String userId = userContext.getUserId();
         transaction.setUserId(userId);
+
         TransactionRecurrence transactionRecurrence = unsavedTransaction.getTransactionRecurrenceType();
-        if (transactionRecurrence != null && !transactionRecurrence.equals(TransactionRecurrence.NONE)) {
-            RecurringTransactionDefinition recurringTransactionDefinition =
-                    recurringTransactionService.createRecurringTransactionDefinition(transaction, transactionRecurrence);
-            transaction.setTransactionDefinition(recurringTransactionDefinition);
-        }
-        Long subCategoryId = transaction.getSubCategory().getId();
-        BudgetCycle budgetCycle = budgetCycleService.getActiveBudgetCycleBySubCategoryId(subCategoryId, userId);
-        if (budgetCycle != null)
-            transaction.setBudgetCycle(budgetCycle);
+        setRecurringTransaction(transactionRecurrence, transaction);
+
+        setBudgetCycle(transaction, userId);
+
         Transaction savedTransaction = transactionRepository.save(transaction);
         log.info("Transaction of {} saved with id {}", userContext.getUserName(), savedTransaction.getId());
+        return transactionMapper.mapToDto(savedTransaction);
+    }
+
+    @Transactional
+    public TransactionDto updateTransaction(TransactionDto transactionDto) {
+
+        Transaction transaction = transactionMapper.mapToEntity(transactionDto);
+        String userId = userContext.getUserId();
+        transaction.setUserId(userId);
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
         return transactionMapper.mapToDto(savedTransaction);
     }
 
@@ -78,6 +87,21 @@ public class TransactionService {
         String userId = userContext.getUserId();
         log.info("Transaction of {} is deleted with id {}", userContext.getUserName(), transactionId);
         transactionRepository.deleteByIdAndUserId(transactionId, userId);
+    }
+
+    private void setBudgetCycle(Transaction transaction, String userId) {
+        Long subCategoryId = transaction.getSubCategory().getId();
+        BudgetCycle budgetCycle = budgetCycleService.getActiveBudgetCycleBySubCategoryId(subCategoryId, userId);
+        if (budgetCycle != null)
+            transaction.setBudgetCycle(budgetCycle);
+    }
+
+    private void setRecurringTransaction(TransactionRecurrence transactionRecurrence, Transaction transaction) {
+        if (transactionRecurrence != null && !transactionRecurrence.equals(TransactionRecurrence.NONE)) {
+            RecurringTransactionDefinition recurringTransactionDefinition =
+                    recurringTransactionService.createRecurringTransactionDefinition(transaction, transactionRecurrence);
+            transaction.setTransactionDefinition(recurringTransactionDefinition);
+        }
     }
 
 }

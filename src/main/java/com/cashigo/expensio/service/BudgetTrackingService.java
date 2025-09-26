@@ -28,9 +28,10 @@ public class BudgetTrackingService {
         Instant cycleStartDate = budgetCycle.getCycleStartDateTime();
         Instant cycleEndDate = budgetCycle.getCycleEndDateTime();
         List<SubCategory> subCategories = subCategoryService.getSubCategoryEntities(categoryId);
+        List<Long> subCategoryIds = subCategories.stream().map(SubCategory::getId).toList();
         String userId = userContext.getUserId();
         List<Transaction> transactions = transactionRepository
-                .findTransactionsByUserIdAndSubCategory_IsInAndTransactionDateTimeBetween(userId, subCategories, cycleStartDate, cycleEndDate);
+                .findTransactionsByInstantRangeWithSubCategories(userId, subCategoryIds, cycleStartDate, cycleEndDate);
         transactions.forEach(transaction -> {
             transaction.setBudgetCycle(budgetCycle);
         });
