@@ -1,6 +1,7 @@
-package com.cashigo.expensio.dto.exception;
+package com.cashigo.expensio.dto.exception.handler;
 
 import com.cashigo.expensio.dto.ErrorResponse;
+import com.cashigo.expensio.dto.exception.NoSubCategoryFoundException;
 import com.cashigo.expensio.dto.mapper.ErrorResponseMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;

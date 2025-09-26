@@ -3,6 +3,7 @@ package com.cashigo.expensio.model;
 import com.cashigo.expensio.common.consts.BudgetRecurrence;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.UUID;
         }
 )
 @Data
+@ToString(exclude = "budgetCycles")
 public class BudgetDefinition {
 
     @Id

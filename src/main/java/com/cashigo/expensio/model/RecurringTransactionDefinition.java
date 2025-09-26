@@ -3,6 +3,7 @@ package com.cashigo.expensio.model;
 import com.cashigo.expensio.common.consts.TransactionRecurrence;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @Entity
 @Data
+@ToString(exclude = {"transactions"})
 public class RecurringTransactionDefinition {
 
     @Id

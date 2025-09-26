@@ -18,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
@@ -51,11 +50,9 @@ public class BudgetDefinitionService {
         return budgetDefinitionMapper.mapToDto(data);
     }
 
-    public List<BudgetDefinitionDto> getBudgetDefinitionsByUserId(int pageNum) {
+    public List<BudgetDefinitionDto> getBudgetDefinitionsByUserId() {
         String userId = userContext.getUserId();
-        Sort sortByCategory = Sort.by("category").ascending();
-        Pageable pageable = PageRequest.of(pageNum, pageSize, sortByCategory);
-        List<BudgetDefinition> budgetDefinitions = budgetDefinitionRepository.findBudgetDefinitionsByUserId(userId, pageable);
+        List<BudgetDefinition> budgetDefinitions = budgetDefinitionRepository.findBudgetDefinitionsByUserId(userId);
         return budgetDefinitions
                 .stream().map(budgetDefinitionMapper::mapToDto).toList();
     }

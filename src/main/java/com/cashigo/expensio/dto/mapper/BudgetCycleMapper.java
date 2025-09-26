@@ -20,7 +20,7 @@ public class BudgetCycleMapper implements BiMapper<BudgetCycleDto, BudgetCycle> 
         if (dto == null) return null;
 
         BudgetCycle entity = new BudgetCycle();
-        entity.setBudgetCycleId(dto.getBudgetCycleId());
+        entity.setId(dto.getBudgetCycleId());
 
         if (dto.getBudgetDefinitionId() != null) {
             BudgetDefinition budgetDef = new BudgetDefinition();
@@ -38,7 +38,7 @@ public class BudgetCycleMapper implements BiMapper<BudgetCycleDto, BudgetCycle> 
         if (entity == null) return null;
 
         BudgetCycleDto dto = new BudgetCycleDto();
-        dto.setBudgetCycleId(entity.getBudgetCycleId());
+        dto.setBudgetCycleId(entity.getId());
         dto.setBudgetDefinitionId(entity.getBudgetDefinition() != null ? entity.getBudgetDefinition().getId() : null);
 
         ZoneId zoneId = ZoneId.of(zone);

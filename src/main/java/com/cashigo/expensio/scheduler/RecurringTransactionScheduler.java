@@ -32,7 +32,7 @@ public class RecurringTransactionScheduler {
     private final TransactionRepository transactionRepository;
     private final BudgetCycleService budgetCycleService;
 
-    @Scheduled(cron = "0 */4 * * * *")
+    @Scheduled(cron = "0 */1 * * * *")
     @Transactional
     public void saveRecurringTransaction() {
         log.info("Recurring Transactions...");
@@ -76,7 +76,9 @@ public class RecurringTransactionScheduler {
         recurringTransactionDefinition.setLastProcessedInstant(currProcessedInstant);
         recurringTransactionDefinition.setNextOccurrence(nextProcessedDate);
         Long subCategoryId = recurringTransactionDefinition.getSubCategory().getId();
-        BudgetCycle activeCycle = budgetCycleService.getActiveBudgetCycleBySubCategoryId(subCategoryId);
+        String userId = recurringTransactionDefinition.getUserId();
+        BudgetCycle activeCycle = budgetCycleService.getActiveBudgetCycleBySubCategoryId(subCategoryId, userId);
+        log.info("Active cycle {}", activeCycle != null ? activeCycle.getId() : "What the");
         if (activeCycle != null)
             transaction.setBudgetCycle(activeCycle);
         return transaction;

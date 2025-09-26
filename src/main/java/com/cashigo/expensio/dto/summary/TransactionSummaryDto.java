@@ -1,4 +1,4 @@
-package com.cashigo.expensio.dto;
+package com.cashigo.expensio.dto.summary;
 
 import lombok.Data;
 

@@ -1,6 +1,7 @@
-package com.cashigo.expensio.dto.mapper;
+package com.cashigo.expensio.dto.summary.mapper;
 
-import com.cashigo.expensio.dto.TransactionSummaryDto;
+import com.cashigo.expensio.dto.mapper.Mapper;
+import com.cashigo.expensio.dto.summary.TransactionSummaryDto;
 import com.cashigo.expensio.model.Transaction;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.time.ZoneId;
 
 @Component
-public class TransactionSummaryMapper implements Mapper<Transaction, TransactionSummaryDto> {
+public class TransactionToSummaryMapper implements Mapper<Transaction, TransactionSummaryDto> {
 
     @Value("${zone.id}")
     private String zoneId;

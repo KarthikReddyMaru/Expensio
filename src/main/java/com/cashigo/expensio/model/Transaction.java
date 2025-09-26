@@ -2,6 +2,7 @@ package com.cashigo.expensio.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -19,6 +20,7 @@ import java.util.UUID;
         }
 )
 @Data
+@ToString(exclude = {""})
 public class Transaction {
 
     @Id

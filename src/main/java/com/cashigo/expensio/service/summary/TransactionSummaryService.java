@@ -1,8 +1,8 @@
-package com.cashigo.expensio.service;
+package com.cashigo.expensio.service.summary;
 
 import com.cashigo.expensio.common.security.UserContext;
-import com.cashigo.expensio.dto.TransactionSummaryDto;
-import com.cashigo.expensio.dto.mapper.TransactionSummaryMapper;
+import com.cashigo.expensio.dto.summary.TransactionSummaryDto;
+import com.cashigo.expensio.dto.summary.mapper.TransactionToSummaryMapper;
 import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.List;
 public class TransactionSummaryService {
 
     private final TransactionRepository transactionRepository;
-    private final TransactionSummaryMapper transactionSummaryMapper;
+    private final TransactionToSummaryMapper transactionToSummaryMapper;
     private final UserContext userContext;
 
     @Value("${page.size}")
@@ -30,7 +30,7 @@ public class TransactionSummaryService {
         Sort sort = Sort.by("transactionDateTime").descending();
         Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
         List<Transaction> transactions = transactionRepository.findTransactionsByUserId(userId, pageable);
-        return transactions.stream().map(transactionSummaryMapper::map).toList();
+        return transactions.stream().map(transactionToSummaryMapper::map).toList();
     }
 
 }

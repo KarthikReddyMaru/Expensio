@@ -65,7 +65,7 @@ public class TransactionService {
             transaction.setTransactionDefinition(recurringTransactionDefinition);
         }
         Long subCategoryId = transaction.getSubCategory().getId();
-        BudgetCycle budgetCycle = budgetCycleService.getActiveBudgetCycleBySubCategoryId(subCategoryId);
+        BudgetCycle budgetCycle = budgetCycleService.getActiveBudgetCycleBySubCategoryId(subCategoryId, userId);
         if (budgetCycle != null)
             transaction.setBudgetCycle(budgetCycle);
         Transaction savedTransaction = transactionRepository.save(transaction);

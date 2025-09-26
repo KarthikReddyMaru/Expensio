@@ -2,6 +2,7 @@ package com.cashigo.expensio.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -11,10 +12,12 @@ import java.time.Instant;
 @EntityListeners(AuditingEntityListener.class)
 @Table(
         indexes = {
-                @Index(name = "sub_category_name_idx", columnList = "name")
+                @Index(name = "sub_category_name_idx", columnList = "name"),
+                @Index(name = "category_idx", columnList = "category_id")
         }
 )
 @Data
+@ToString(exclude = {""})
 public class SubCategory {
 
     @Id
@@ -27,7 +30,7 @@ public class SubCategory {
     private boolean isSystem;
 
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false, referencedColumnName = "id")
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @CreatedDate

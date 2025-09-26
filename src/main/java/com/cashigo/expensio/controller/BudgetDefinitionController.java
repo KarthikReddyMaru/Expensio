@@ -19,11 +19,10 @@ public class BudgetDefinitionController {
 
     private final BudgetDefinitionService budgetDefinitionService;
 
-    @GetMapping(params = {"pageNum"})
-    public ResponseEntity<Response<List<BudgetDefinitionDto>>> getBudgetDefinitionsByUserId(
-            @RequestParam(required = false, defaultValue = "0") int pageNum) {
+    @GetMapping
+    public ResponseEntity<Response<List<BudgetDefinitionDto>>> getBudgetDefinitionsByUserId() {
         Response<List<BudgetDefinitionDto>> response = new Response<>();
-        List<BudgetDefinitionDto> budgetDefinitions = budgetDefinitionService.getBudgetDefinitionsByUserId(pageNum);
+        List<BudgetDefinitionDto> budgetDefinitions = budgetDefinitionService.getBudgetDefinitionsByUserId();
         response.setData(budgetDefinitions);
         return ResponseEntity.ok(response);
     }

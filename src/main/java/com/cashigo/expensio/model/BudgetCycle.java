@@ -2,6 +2,7 @@ package com.cashigo.expensio.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.util.List;
@@ -16,11 +17,12 @@ import java.util.UUID;
         }
 )
 @Data
+@ToString(exclude = {"transactions"})
 public class BudgetCycle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID budgetCycleId;
+    private UUID id;
 
     @ManyToOne
     private BudgetDefinition budgetDefinition;

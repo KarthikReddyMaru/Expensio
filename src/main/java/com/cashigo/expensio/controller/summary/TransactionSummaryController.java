@@ -1,8 +1,8 @@
-package com.cashigo.expensio.controller;
+package com.cashigo.expensio.controller.summary;
 
 import com.cashigo.expensio.dto.Response;
-import com.cashigo.expensio.dto.TransactionSummaryDto;
-import com.cashigo.expensio.service.TransactionSummaryService;
+import com.cashigo.expensio.dto.summary.TransactionSummaryDto;
+import com.cashigo.expensio.service.summary.TransactionSummaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

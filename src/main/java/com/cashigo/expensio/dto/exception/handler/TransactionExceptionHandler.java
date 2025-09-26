@@ -1,6 +1,7 @@
-package com.cashigo.expensio.dto.exception;
+package com.cashigo.expensio.dto.exception.handler;
 
 import com.cashigo.expensio.dto.ErrorResponse;
+import com.cashigo.expensio.dto.exception.NoTransactionFoundException;
 import com.cashigo.expensio.dto.mapper.ErrorResponseMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
