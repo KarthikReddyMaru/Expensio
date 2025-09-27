@@ -15,8 +15,16 @@ import java.util.UUID;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
-    @Query("select t from Transaction t where t.id = :id and t.userId = :userid")
+    @Query("select t from Transaction t where t.id = :id and t.userId = :userId")
     Optional<Transaction> findTransactionById(UUID id, String userId);
+
+    @Query("""
+        select t from Transaction t
+            left join fetch t.subCategory sc
+            left join fetch sc.category
+        where t.userId = :userId and t.id = :id
+    """)
+    Optional<Transaction> findTransactionByIdWithSubCat(UUID id, String userId);
 
     @Query("""
         select t from Transaction t

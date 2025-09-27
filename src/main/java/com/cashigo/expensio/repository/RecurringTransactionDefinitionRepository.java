@@ -23,4 +23,6 @@ public interface RecurringTransactionDefinitionRepository extends JpaRepository<
     
     List<RecurringTransactionDefinition> findRecurringTransactionDefinitionsByNextOccurrenceEquals(LocalDate nextOccurrence);
 
+    void deleteByIdAndUserId(UUID id, String userId);
+    
 }

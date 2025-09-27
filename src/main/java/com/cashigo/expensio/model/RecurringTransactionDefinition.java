@@ -31,6 +31,7 @@ public class RecurringTransactionDefinition {
     @Column(nullable = false)
     private String userId;
 
+    @Column(updatable = false)
     private BigDecimal amount = BigDecimal.ZERO;
 
     @ManyToOne
@@ -46,6 +47,7 @@ public class RecurringTransactionDefinition {
     @Enumerated(EnumType.STRING)
     private TransactionRecurrence transactionRecurrenceType;
 
+    @Column(nullable = false)
     private Instant lastProcessedInstant;
 
     @Column(nullable = false)
