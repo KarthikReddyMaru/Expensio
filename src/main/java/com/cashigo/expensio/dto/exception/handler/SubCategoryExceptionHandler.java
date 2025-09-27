@@ -2,7 +2,7 @@ package com.cashigo.expensio.dto.exception.handler;
 
 import com.cashigo.expensio.dto.ErrorResponse;
 import com.cashigo.expensio.dto.exception.NoSubCategoryFoundException;
-import com.cashigo.expensio.dto.exception.SystemPropertiesCannotBeDeletedException;
+import com.cashigo.expensio.dto.exception.SystemPropertiesCannotBeModifiedException;
 import com.cashigo.expensio.dto.mapper.ErrorResponseMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -25,8 +25,8 @@ public class SubCategoryExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(SystemPropertiesCannotBeDeletedException.class)
-    public ResponseEntity<ErrorResponse> systemPropertiesDeletion(SystemPropertiesCannotBeDeletedException exception) {
+    @ExceptionHandler(SystemPropertiesCannotBeModifiedException.class)
+    public ResponseEntity<ErrorResponse> systemPropertiesDeletion(SystemPropertiesCannotBeModifiedException exception) {
         ErrorResponse errorResponse = ErrorResponseMapper.fromException(exception, HttpStatus.NOT_ACCEPTABLE);
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_ACCEPTABLE);
     }

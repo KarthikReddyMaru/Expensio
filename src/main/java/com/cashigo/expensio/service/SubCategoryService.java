@@ -4,7 +4,7 @@ import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.SubCategoryDto;
 import com.cashigo.expensio.dto.exception.NoCategoryFoundException;
 import com.cashigo.expensio.dto.exception.NoSubCategoryFoundException;
-import com.cashigo.expensio.dto.exception.SystemPropertiesCannotBeDeletedException;
+import com.cashigo.expensio.dto.exception.SystemPropertiesCannotBeModifiedException;
 import com.cashigo.expensio.dto.mapper.SubCategoryMapper;
 import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.model.SubCategory;
@@ -64,6 +64,10 @@ public class SubCategoryService {
     @SneakyThrows
     public SubCategoryDto saveSubCategory(SubCategoryDto unsavedSubCategory) {
 
+        Long subCategoryId = unsavedSubCategory.getId();
+        if (subCategoryId != null && subCategoryId <= systemSubCategories)
+            throw new SystemPropertiesCannotBeModifiedException();
+
         Long categoryId = unsavedSubCategory.getCategoryId();
         String userid = userContext.getUserId();
         boolean categoryExists = categoryRepository.existsCategoryById(categoryId, userid);
@@ -80,7 +84,7 @@ public class SubCategoryService {
     @Transactional
     public void deleteSubCategory(Long subCategoryId) {
         if (subCategoryId <= systemSubCategories)
-            throw new SystemPropertiesCannotBeDeletedException();
+            throw new SystemPropertiesCannotBeModifiedException();
         String userId = userContext.getUserId();
         subCategoryRepository.deleteSubCategoryByIdAndCategory_UserId(subCategoryId, userId);
         log.info("Sub Category of {} with id {} is deleted",

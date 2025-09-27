@@ -3,7 +3,7 @@ package com.cashigo.expensio.service;
 import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.CategoryDto;
 import com.cashigo.expensio.dto.exception.NoCategoryFoundException;
-import com.cashigo.expensio.dto.exception.SystemPropertiesCannotBeDeletedException;
+import com.cashigo.expensio.dto.exception.SystemPropertiesCannotBeModifiedException;
 import com.cashigo.expensio.dto.mapper.CategoryMapper;
 import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.repository.CategoryRepository;
@@ -48,21 +48,21 @@ public class CategoryService {
     @SneakyThrows
     @Transactional
     public CategoryDto saveAndUpdateCategory(CategoryDto unsavedCategory) {
-        log.info("Unsaved category {}", unsavedCategory);
+        Long categoryId = unsavedCategory.getId();
+        if (categoryId != null && categoryId <= systemCategories)
+            throw new SystemPropertiesCannotBeModifiedException();
         Category newCategory = categoryMapper.mapToEntity(unsavedCategory);
         String userId = userContext.getUserId();
         newCategory.setUserId(userId);
         Category savedCategory = categoryRepository.save(newCategory);
-        log.info("Saved category {}", savedCategory);
         return categoryMapper.mapToDto(savedCategory);
     }
 
     @Transactional
     public void deleteCategoryById(Long categoryId) {
         if (categoryId <= systemCategories)
-            throw new SystemPropertiesCannotBeDeletedException();
+            throw new SystemPropertiesCannotBeModifiedException();
         String userId = userContext.getUserId();
         categoryRepository.deleteCategoryByIdAndUserId(categoryId, userId);
-        log.info("Category with id {} is deleted", categoryId);
     }
 }

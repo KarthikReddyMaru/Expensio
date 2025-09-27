@@ -9,22 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/subcategory")
 @RequiredArgsConstructor
 public class SubCategoryController {
 
     private final SubCategoryService subCategoryService;
-
-    @GetMapping("/{categoryId}")
-    public ResponseEntity<Response<List<SubCategoryDto>>> getSubCategories(@PathVariable Long categoryId) {
-        Response<List<SubCategoryDto>> response = new Response<>();
-        List<SubCategoryDto> subCategories = subCategoryService.getSubCategories(categoryId);
-        response.setData(subCategories);
-        return ResponseEntity.ok(response);
-    }
 
     @GetMapping("/{subCategoryId}")
     public ResponseEntity<Response<SubCategoryDto>> getSubCategoryById(@PathVariable Long subCategoryId) {
