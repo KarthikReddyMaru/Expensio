@@ -98,7 +98,9 @@ public class TransactionService {
     private void setBudgetCycle(Transaction transaction, String userId) {
         Long subCategoryId = transaction.getSubCategory().getId();
         BudgetCycle budgetCycle = budgetCycleService.getActiveBudgetCycleBySubCategoryId(subCategoryId, userId);
-        transaction.setBudgetCycle(budgetCycle);
+        if (transaction.getTransactionDateTime().isBefore(budgetCycle.getCycleEndDateTime()) &&
+                transaction.getTransactionDateTime().isAfter(budgetCycle.getCycleStartDateTime()))
+            transaction.setBudgetCycle(budgetCycle);
     }
 
     private void setRecurringTransaction(TransactionRecurrence transactionRecurrence, Transaction transaction) {
