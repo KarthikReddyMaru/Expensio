@@ -70,7 +70,7 @@ public class BudgetDefinitionService {
 
         budgetDefinitionRepository.save(budgetDefinition);
 
-        budgetTrackingService.addPreviousTransactionsToCurrentBudgetCycle(budgetCycle, categoryId);
+        budgetTrackingService.addPreviousTransactionsToCurrentBudgetCycle(budgetCycle);
 
         return budgetDefinitionMapper.mapToDto(budgetDefinition);
     }

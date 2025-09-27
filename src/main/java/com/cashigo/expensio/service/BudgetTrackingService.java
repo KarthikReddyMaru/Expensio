@@ -21,20 +21,17 @@ public class BudgetTrackingService {
 
     private final TransactionRepository transactionRepository;
     private final SubCategoryService subCategoryService;
-    private final UserContext userContext;
 
-
-    public void addPreviousTransactionsToCurrentBudgetCycle(BudgetCycle budgetCycle, Long categoryId) {
+    public void addPreviousTransactionsToCurrentBudgetCycle(BudgetCycle budgetCycle) {
+        Long categoryId = budgetCycle.getBudgetDefinition().getCategory().getId();
         Instant cycleStartDate = budgetCycle.getCycleStartDateTime();
         Instant cycleEndDate = budgetCycle.getCycleEndDateTime();
         List<SubCategory> subCategories = subCategoryService.getSubCategoryEntities(categoryId);
         List<Long> subCategoryIds = subCategories.stream().map(SubCategory::getId).toList();
-        String userId = userContext.getUserId();
+        String userId = budgetCycle.getBudgetDefinition().getUserId();
         List<Transaction> transactions = transactionRepository
                 .findTransactionsByInstantRangeWithSubCategories(userId, subCategoryIds, cycleStartDate, cycleEndDate);
-        transactions.forEach(transaction -> {
-            transaction.setBudgetCycle(budgetCycle);
-        });
+        transactions.forEach(transaction -> transaction.setBudgetCycle(budgetCycle));
         transactionRepository.saveAll(transactions);
     }
 
