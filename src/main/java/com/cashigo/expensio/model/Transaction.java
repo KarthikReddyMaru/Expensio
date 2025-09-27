@@ -35,10 +35,11 @@ public class Transaction {
     private BigDecimal amount;
 
     @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(
+    @JoinColumn(foreignKey =
+        @ForeignKey(
             name = "fk_sub_category",
             foreignKeyDefinition = "FOREIGN KEY (sub_category_id) REFERENCES Sub_category (id) ON DELETE SET NULL"
-    ))
+        ))
     private SubCategory subCategory;
 
     @Column(nullable = false)
@@ -51,8 +52,7 @@ public class Transaction {
         @ForeignKey(
                 name = "fk_recurring_transaction",
                 foreignKeyDefinition = "FOREIGN KEY (transaction_definition_id) REFERENCES recurring_transactions(id) ON DELETE SET NULL"
-        )
-    )
+        ))
     private RecurringTransactionDefinition transactionDefinition;
 
     @ManyToOne

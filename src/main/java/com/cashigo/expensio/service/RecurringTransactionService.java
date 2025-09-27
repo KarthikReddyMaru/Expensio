@@ -1,6 +1,7 @@
 package com.cashigo.expensio.service;
 
 import com.cashigo.expensio.common.consts.TransactionRecurrence;
+import com.cashigo.expensio.dto.exception.InvalidRecurrenceTransactionException;
 import com.cashigo.expensio.model.RecurringTransactionDefinition;
 import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.RecurringTransactionDefinitionRepository;
@@ -39,14 +40,24 @@ public class RecurringTransactionService {
         return transactionDefinitionRepository.save(recurringTransactionDefinition);
     }
 
-    private static RecurringTransactionDefinition mapToTransactionDefinition(Transaction transaction, TransactionRecurrence transactionRecurrence) {
+    private RecurringTransactionDefinition mapToTransactionDefinition(Transaction transaction, TransactionRecurrence transactionRecurrence) {
         RecurringTransactionDefinition recurringTransactionDefinition = new RecurringTransactionDefinition();
         recurringTransactionDefinition.setAmount(transaction.getAmount());
         recurringTransactionDefinition.setUserId(transaction.getUserId());
         recurringTransactionDefinition.setSubCategory(transaction.getSubCategory());
         recurringTransactionDefinition.setTransactionRecurrenceType(transactionRecurrence);
         recurringTransactionDefinition.setNote(transaction.getNote());
-        recurringTransactionDefinition.setLastProcessedInstant(transaction.getTransactionDateTime());
+        if (isValidRecurrenceTransaction(transaction.getTransactionDateTime()))
+            recurringTransactionDefinition.setLastProcessedInstant(transaction.getTransactionDateTime());
         return recurringTransactionDefinition;
+    }
+
+    private boolean isValidRecurrenceTransaction(Instant transactionInstant) {
+        ZoneId zoneId = ZoneId.of(zone);
+        LocalDate today = LocalDate.now(zoneId);
+        LocalDate transactionDate = transactionInstant.atZone(zoneId).toLocalDate();
+        if (transactionDate.isBefore(today))
+            throw new InvalidRecurrenceTransactionException("A recurring transaction cannot have a past date");
+        return true;
     }
 }
