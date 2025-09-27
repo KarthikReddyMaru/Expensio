@@ -3,12 +3,14 @@ package com.cashigo.expensio.service;
 import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.CategoryDto;
 import com.cashigo.expensio.dto.exception.NoCategoryFoundException;
+import com.cashigo.expensio.dto.exception.SystemPropertiesCannotBeDeletedException;
 import com.cashigo.expensio.dto.mapper.CategoryMapper;
 import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,9 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     private final UserContext userContext;
+
+    @Value("${system.categories}")
+    private Long systemCategories;
 
     public List<CategoryDto> getAllCategoriesByUserId() {
         String userId = userContext.getUserId();
@@ -53,9 +58,11 @@ public class CategoryService {
     }
 
     @Transactional
-    public void deleteCategoryById(Long id) {
+    public void deleteCategoryById(Long categoryId) {
+        if (categoryId <= systemCategories)
+            throw new SystemPropertiesCannotBeDeletedException();
         String userId = userContext.getUserId();
-        categoryRepository.deleteCategoryByIdAndUserId(id, userId);
-        log.info("Category with id {} is deleted", id);
+        categoryRepository.deleteCategoryByIdAndUserId(categoryId, userId);
+        log.info("Category with id {} is deleted", categoryId);
     }
 }

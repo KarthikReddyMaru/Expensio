@@ -4,6 +4,7 @@ import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.SubCategoryDto;
 import com.cashigo.expensio.dto.exception.NoCategoryFoundException;
 import com.cashigo.expensio.dto.exception.NoSubCategoryFoundException;
+import com.cashigo.expensio.dto.exception.SystemPropertiesCannotBeDeletedException;
 import com.cashigo.expensio.dto.mapper.SubCategoryMapper;
 import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.model.SubCategory;
@@ -12,6 +13,7 @@ import com.cashigo.expensio.repository.SubCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class SubCategoryService {
+
+    @Value("${system.sub.categories}")
+    private Long systemSubCategories;
 
     private final SubCategoryRepository subCategoryRepository;
     private final CategoryRepository categoryRepository;
@@ -74,6 +79,8 @@ public class SubCategoryService {
 
     @Transactional
     public void deleteSubCategory(Long subCategoryId) {
+        if (subCategoryId <= systemSubCategories)
+            throw new SystemPropertiesCannotBeDeletedException();
         String userId = userContext.getUserId();
         subCategoryRepository.deleteSubCategoryByIdAndCategory_UserId(subCategoryId, userId);
         log.info("Sub Category of {} with id {} is deleted",

@@ -15,6 +15,7 @@ import java.util.UUID;
 @Data
 @ToString(exclude = {"transactions"})
 @Table(
+        name = "RecurringTransactions",
         indexes =
                 @Index(name = "next_occurrence_idx", columnList = "nextOccurrence")
 )
