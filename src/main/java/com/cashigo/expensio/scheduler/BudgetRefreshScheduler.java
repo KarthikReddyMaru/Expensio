@@ -10,6 +10,7 @@ import com.cashigo.expensio.service.BudgetDefinitionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,7 @@ public class BudgetRefreshScheduler {
     @Value("${zone.id}")
     private String zone;
 
-    //    @Scheduled(cron = "0 */2 * * * *")
+    @Scheduled(cron = "0 0 1 * * Mon")
     @Transactional
     public void refreshWeeklyCycles() {
         log.info("Scheduler starts...");

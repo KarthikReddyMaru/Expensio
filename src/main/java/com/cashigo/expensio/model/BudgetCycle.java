@@ -10,6 +10,10 @@ import java.util.UUID;
 
 @Entity
 @Table(
+        uniqueConstraints =
+                @UniqueConstraint(name = "no_duplicate_cycle_unq", columnNames =
+                        {"cycle_start_date_time", "cycle_end_date_time", "budget_definition_id"}
+                ),
         indexes = {
                 @Index(name = "cycleStartDate_idx", columnList = "cycleStartDateTime"),
                 @Index(name = "cycleEndDate_idx", columnList = "cycleEndDateTime"),
