@@ -19,7 +19,7 @@ public class CategoryDto {
     @NotBlank(message = "Category name cannot be empty")
     private String name;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private boolean isSystem;
+    private boolean system;
     @Valid
     private List<SubCategoryDto> subCategories;
 }

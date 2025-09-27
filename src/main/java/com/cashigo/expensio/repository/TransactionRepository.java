@@ -28,7 +28,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             String userId, List<Long> subCategoryIds, Instant start, Instant end);
 
     @Query(
-            value = "select distinct t from Transaction t left join fetch t.subCategory sc join fetch sc.category where t.userId = :userId",
+            value = "select distinct t from Transaction t left join fetch t.subCategory sc left join fetch sc.category where t.userId = :userId",
             countQuery = "select count(t) from Transaction t where t.userId = :userId"
     )
     Page<Transaction> findTransactionsOfUserWithSubCategories(String userId, Pageable pageable);

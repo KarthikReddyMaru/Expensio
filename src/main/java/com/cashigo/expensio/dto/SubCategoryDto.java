@@ -16,7 +16,7 @@ public class SubCategoryDto {
     @NotBlank(message = "Sub Category name cannot be empty")
     private String name;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private boolean isSystem;
+    private boolean system;
     @Positive
     @NotNull(message = "Invalid category Id")
     private Long categoryId;
