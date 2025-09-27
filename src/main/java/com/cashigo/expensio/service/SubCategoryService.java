@@ -56,7 +56,15 @@ public class SubCategoryService {
     }
 
     @Transactional
+    @SneakyThrows
     public SubCategoryDto saveSubCategory(SubCategoryDto unsavedSubCategory) {
+
+        Long categoryId = unsavedSubCategory.getCategoryId();
+        String userid = userContext.getUserId();
+        boolean categoryExists = categoryRepository.existsCategoryById(categoryId, userid);
+        if (!categoryExists)
+            throw new NoCategoryFoundException();
+
         SubCategory subCategory = subCategoryMapper.mapToEntity(unsavedSubCategory);
         SubCategory savedSubCategory = subCategoryRepository.save(subCategory);
         log.info("Sub category of {} is saved/updated in category (Id: {})",

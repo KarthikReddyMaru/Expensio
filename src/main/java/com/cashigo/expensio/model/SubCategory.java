@@ -10,10 +10,10 @@ import java.time.Instant;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(
-        indexes = {
-                @Index(name = "sub_category_name_idx", columnList = "name"),
+        uniqueConstraints =
+                @UniqueConstraint(name = "no_duplicate_subCat_per_cat_unq", columnNames = {"name", "category_id"}),
+        indexes =
                 @Index(name = "category_idx", columnList = "category_id")
-        }
 )
 @Data
 public class SubCategory {

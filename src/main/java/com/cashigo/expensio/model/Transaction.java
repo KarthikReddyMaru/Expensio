@@ -16,7 +16,7 @@ import java.util.UUID;
 @Table(
         indexes = {
                 @Index(name = "user_id_idx", columnList = "userId"),
-                @Index(name = "transaction_date_time_idx", columnList = "transactionDateTime")
+                @Index(name = "sub_cat_idx", columnList = "sub_category_id")
         }
 )
 @Data

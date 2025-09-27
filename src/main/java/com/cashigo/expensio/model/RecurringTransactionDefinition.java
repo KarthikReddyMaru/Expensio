@@ -14,6 +14,10 @@ import java.util.UUID;
 @Entity
 @Data
 @ToString(exclude = {"transactions"})
+@Table(
+        indexes =
+                @Index(name = "next_occurrence_idx", columnList = "nextOccurrence")
+)
 public class RecurringTransactionDefinition {
 
     @Id

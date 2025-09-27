@@ -19,7 +19,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("select c from Category c left join fetch c.subCategories where c.id = :id and (c.userId = :userId or c.isSystem = true )")
     Optional<Category> findCategoryByIdWithSubCategories(Long id, String userId);
 
-    boolean existsCategoryByIdAndUserId(Long id, String userId);
+    @Query("select case when count(c) > 0 then true else false end from Category c where c.id = :id and (c.userId = :userId or c.isSystem = true )")
+    boolean existsCategoryById(Long id, String userId);
 
     void deleteCategoryByIdAndUserId(Long id, String userId);
 }

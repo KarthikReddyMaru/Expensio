@@ -9,7 +9,6 @@ import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.BudgetDefinition;
 import com.cashigo.expensio.repository.BudgetDefinitionRepository;
 import com.cashigo.expensio.repository.CategoryRepository;
-import com.cashigo.expensio.repository.SubCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +61,7 @@ public class BudgetDefinitionService {
         budgetDefinition.setUserId(userId);
 
         Long categoryId = budgetDefinition.getCategory().getId();
-        boolean categoryExists = categoryRepository.existsCategoryByIdAndUserId(categoryId, userId);
+        boolean categoryExists = categoryRepository.existsCategoryById(categoryId, userId);
         if (!categoryExists)
             throw new NoCategoryFoundException();
 

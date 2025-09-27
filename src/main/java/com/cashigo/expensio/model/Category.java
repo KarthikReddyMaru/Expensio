@@ -12,9 +12,11 @@ import java.util.List;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(
+        uniqueConstraints =
+                @UniqueConstraint(name = "no_duplicate_cat_unq", columnNames = {"name", "userId"}),
         indexes = {
-                @Index(name = "category_idx", columnList = "name", unique = false),
-                @Index(name = "category_userId_idx", columnList = "userId", unique = false)
+                @Index(name = "category_idx", columnList = "name"),
+                @Index(name = "category_userId_idx", columnList = "userId")
         }
 )
 @Data

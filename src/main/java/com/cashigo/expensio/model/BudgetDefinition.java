@@ -11,9 +11,11 @@ import java.util.UUID;
 
 @Entity
 @Table(
+        uniqueConstraints =
+                @UniqueConstraint(name = "userId_Category_unq", columnNames = {"userId", "category_id"}),
         indexes = {
-                @Index(name = "userId_idx", columnList = "userId"),
-                @Index(name = "category_idx", columnList = "category_id")
+                @Index(name = "userId_idx", columnList = "user_id"),
+                @Index(name = "userId_category_idx", columnList = "user_id, category_id"),
         }
 )
 @Data
