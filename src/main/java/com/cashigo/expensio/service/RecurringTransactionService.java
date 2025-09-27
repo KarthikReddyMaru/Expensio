@@ -43,6 +43,7 @@ public class RecurringTransactionService {
         return transactionDefinitionRepository.save(recurringTransactionDefinition);
     }
 
+    @Transactional
     public void deleteRecurringTransactionDefinition(UUID definitionId) {
         String userId = userContext.getUserId();
         transactionDefinitionRepository.deleteByIdAndUserId(definitionId, userId);
