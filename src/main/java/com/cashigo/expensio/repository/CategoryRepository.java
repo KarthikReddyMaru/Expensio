@@ -18,7 +18,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             left join fetch c.subCategories sc
         where c.userId = :userId or (c.isSystem = true and (sc.isSystem = true or sc.userId = :userId))
     """)
-    List<Category> findCategoriesByUserId(@Param("userId") String userId, Sort sort);
+    List<Category> findCategoriesOfUserWithSubCategories(@Param("userId") String userId, Sort sort);
+
+    @Query("select c from Category c where c.id = :categoryId and c.userId = :userId")
+    Optional<Category> findCategoryById(Long categoryId, String userId);
 
     @Query("""
         select c from Category c

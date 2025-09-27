@@ -37,7 +37,7 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<Response<CategoryDto>> saveCategory(@Valid @RequestBody CategoryDto categoryDto) {
         Response<CategoryDto> response = new Response<>();
-        CategoryDto savedCategory = categoryService.saveAndUpdateCategory(categoryDto);
+        CategoryDto savedCategory = categoryService.saveCategory(categoryDto);
         response.setData(savedCategory);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -45,7 +45,7 @@ public class CategoryController {
     @PutMapping
     public ResponseEntity<Response<CategoryDto>> updateCategory(@Valid @RequestBody CategoryDto categoryDto) {
         Response<CategoryDto> response = new Response<>();
-        CategoryDto savedCategory = categoryService.saveAndUpdateCategory(categoryDto);
+        CategoryDto savedCategory = categoryService.updateCategory(categoryDto);
         response.setData(savedCategory);
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
