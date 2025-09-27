@@ -25,6 +25,9 @@ public class SubCategory {
     @Column(nullable = false)
     private String name;
 
+    @Column(updatable = false)
+    private String userId;
+
     private boolean isSystem;
 
     @ManyToOne

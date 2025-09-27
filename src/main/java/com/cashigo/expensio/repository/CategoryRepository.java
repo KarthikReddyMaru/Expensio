@@ -13,13 +13,24 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    @Query("select distinct c from Category c left join fetch c.subCategories where c.userId = :userId or c.isSystem = true ")
+    @Query("""
+        select distinct c from Category c
+            left join fetch c.subCategories sc
+        where c.userId = :userId or (c.isSystem = true and (sc.isSystem = true or sc.userId = :userId))
+    """)
     List<Category> findCategoriesByUserId(@Param("userId") String userId, Sort sort);
 
-    @Query("select c from Category c left join fetch c.subCategories where c.id = :id and (c.userId = :userId or c.isSystem = true )")
-    Optional<Category> findCategoryByIdWithSubCategories(Long id, String userId);
+    @Query("""
+        select c from Category c
+            left join fetch c.subCategories sc
+        where c.id = :categoryId and (c.userId = :userId or (c.isSystem = true and (sc.isSystem = true or sc.userId = :userId)))
+    """)
+    Optional<Category> findCategoryByIdWithSubCategories(Long categoryId, String userId);
 
-    @Query("select case when count(c) > 0 then true else false end from Category c where c.id = :id and (c.userId = :userId or c.isSystem = true )")
+    @Query("""
+        select case when count(c) > 0 then true else false end
+        from Category c where c.id = :id and (c.userId = :userId or c.isSystem = true )
+    """)
     boolean existsCategoryById(Long id, String userId);
 
     void deleteCategoryByIdAndUserId(Long id, String userId);

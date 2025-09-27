@@ -64,21 +64,32 @@ public class SubCategoryService {
     @SneakyThrows
     public SubCategoryDto saveSubCategory(SubCategoryDto unsavedSubCategory) {
 
-        Long subCategoryId = unsavedSubCategory.getId();
-        if (subCategoryId != null && subCategoryId <= systemSubCategories)
-            throw new SystemPropertiesCannotBeModifiedException();
-
-        Long categoryId = unsavedSubCategory.getCategoryId();
-        String userid = userContext.getUserId();
-        boolean categoryExists = categoryRepository.existsCategoryById(categoryId, userid);
-        if (!categoryExists)
-            throw new NoCategoryFoundException();
+        String userId = userContext.getUserId();
+        checkCategoryModificationScope(unsavedSubCategory, userId);
+        checkSubCategoryModificationScope(unsavedSubCategory, userId);
 
         SubCategory subCategory = subCategoryMapper.mapToEntity(unsavedSubCategory);
+        subCategory.setUserId(userId);
         SubCategory savedSubCategory = subCategoryRepository.save(subCategory);
         log.info("Sub category of {} is saved/updated in category (Id: {})",
                 userContext.getUserName(), savedSubCategory.getCategory().getId());
         return subCategoryMapper.mapToDto(savedSubCategory);
+    }
+
+    private void checkCategoryModificationScope(SubCategoryDto unsavedSubCategory, String userId) throws NoCategoryFoundException {
+        Long categoryId = unsavedSubCategory.getCategoryId();
+        boolean categoryExists = categoryRepository.existsCategoryById(categoryId, userId);
+        if (!categoryExists)
+            throw new NoCategoryFoundException();
+    }
+
+    private void checkSubCategoryModificationScope(SubCategoryDto unsavedSubCategory, String userId) throws NoSubCategoryFoundException {
+        Long subCategoryId = unsavedSubCategory.getId();
+        if (subCategoryId == null) return;
+        if (subCategoryId <= systemSubCategories)
+            throw new SystemPropertiesCannotBeModifiedException();
+        if (!subCategoryRepository.existsSubCategoriesById(subCategoryId, userId))
+            throw new NoSubCategoryFoundException();
     }
 
     @Transactional

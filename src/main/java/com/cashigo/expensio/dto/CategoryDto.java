@@ -20,6 +20,6 @@ public class CategoryDto {
     private String name;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private boolean system;
-    @Valid
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private List<SubCategoryDto> subCategories;
 }
