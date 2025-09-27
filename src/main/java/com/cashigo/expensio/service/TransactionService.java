@@ -3,11 +3,14 @@ package com.cashigo.expensio.service;
 import com.cashigo.expensio.common.consts.TransactionRecurrence;
 import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.TransactionDto;
+import com.cashigo.expensio.dto.exception.NoSubCategoryFoundException;
 import com.cashigo.expensio.dto.exception.NoTransactionFoundException;
 import com.cashigo.expensio.dto.mapper.TransactionMapper;
 import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.RecurringTransactionDefinition;
+import com.cashigo.expensio.model.SubCategory;
 import com.cashigo.expensio.model.Transaction;
+import com.cashigo.expensio.repository.SubCategoryRepository;
 import com.cashigo.expensio.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -31,6 +34,7 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
+    private final SubCategoryRepository subCategoryRepository;
     private final RecurringTransactionService recurringTransactionService;
     private final BudgetCycleService budgetCycleService;
     private final UserContext userContext;
@@ -72,11 +76,16 @@ public class TransactionService {
     }
 
     @Transactional
+    @SneakyThrows
     public TransactionDto updateTransaction(TransactionDto transactionDto) {
 
         Transaction transaction = transactionMapper.mapToEntity(transactionDto);
         String userId = userContext.getUserId();
         transaction.setUserId(userId);
+
+        subCategoryRepository
+                .findSubCategoryById(transaction.getSubCategory().getId(), userId)
+                .orElseThrow(NoSubCategoryFoundException::new);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
         return transactionMapper.mapToDto(savedTransaction);

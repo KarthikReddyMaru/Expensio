@@ -3,6 +3,7 @@ package com.cashigo.expensio.controller;
 import com.cashigo.expensio.dto.Response;
 import com.cashigo.expensio.dto.SubCategoryDto;
 import com.cashigo.expensio.service.SubCategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class SubCategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Response<SubCategoryDto>> saveSubCategory(@RequestBody SubCategoryDto subCategory) {
+    public ResponseEntity<Response<SubCategoryDto>> saveSubCategory(@Valid @RequestBody SubCategoryDto subCategory) {
         Response<SubCategoryDto> response = new Response<>();
         SubCategoryDto savedSubCategory = subCategoryService.saveSubCategory(subCategory);
         response.setData(savedSubCategory);
@@ -42,7 +43,7 @@ public class SubCategoryController {
     }
 
     @PutMapping
-    public ResponseEntity<Response<SubCategoryDto>> updateSubCategory(@RequestBody SubCategoryDto subCategory) {
+    public ResponseEntity<Response<SubCategoryDto>> updateSubCategory(@Valid @RequestBody SubCategoryDto subCategory) {
         Response<SubCategoryDto> response = new Response<>();
         SubCategoryDto savedSubCategory = subCategoryService.saveSubCategory(subCategory);
         response.setData(savedSubCategory);

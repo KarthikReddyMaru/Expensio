@@ -3,6 +3,7 @@ package com.cashigo.expensio.controller;
 import com.cashigo.expensio.dto.Response;
 import com.cashigo.expensio.dto.TransactionDto;
 import com.cashigo.expensio.service.TransactionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Response<TransactionDto>> saveTransaction(@RequestBody TransactionDto transactionDto) {
+    public ResponseEntity<Response<TransactionDto>> saveTransaction(@Valid @RequestBody TransactionDto transactionDto) {
         Response<TransactionDto> response = new Response<>();
         TransactionDto savedTransactionDto = transactionService.saveTransaction(transactionDto);
         response.setData(savedTransactionDto);
@@ -43,7 +44,7 @@ public class TransactionController {
     }
 
     @PutMapping
-    public ResponseEntity<Response<TransactionDto>> updateTransaction(@RequestBody TransactionDto transactionDto) {
+    public ResponseEntity<Response<TransactionDto>> updateTransaction(@Valid @RequestBody TransactionDto transactionDto) {
         Response<TransactionDto> response = new Response<>();
         TransactionDto savedTransactionDto = transactionService.updateTransaction(transactionDto);
         response.setData(savedTransactionDto);

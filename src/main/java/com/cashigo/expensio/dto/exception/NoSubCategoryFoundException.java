@@ -7,6 +7,6 @@ public class NoSubCategoryFoundException extends Exception {
     }
 
     public NoSubCategoryFoundException() {
-        super();
+        super("No sub category found");
     }
 }

@@ -25,6 +25,14 @@ public class BootConfig {
         return sub;
     }
 
+    private SubCategory createSubCategory(Category category) {
+        SubCategory sub = new SubCategory();
+        sub.setName("Something");
+        sub.setSystem(false);
+        sub.setCategory(category);
+        return sub;
+    }
+
     private SubCategory createSubCategoryRef(long id) {
         SubCategory sub = new SubCategory();
         sub.setId(id); // only set ID
@@ -149,7 +157,22 @@ public class BootConfig {
                             createSubCategory("Accessories", apparel)
                     )
             );
+
             categoryRepository.save(apparel);
+
+            // 8. Custom
+            Category others = new Category();
+            others.setName("Others");
+            others.setSystem(false);
+            others.setUserId("Anonymous");
+
+            others.setSubCategories(
+                    java.util.List.of(
+                            createSubCategory(others)
+                    )
+            );
+
+            categoryRepository.save(others);
 
             Transaction t1 = new Transaction();
             t1.setUserId("226bc242-1f1d-4ad7-b480-3e2bb0c94f16");

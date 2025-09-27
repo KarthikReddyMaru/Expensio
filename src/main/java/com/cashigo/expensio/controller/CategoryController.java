@@ -3,6 +3,7 @@ package com.cashigo.expensio.controller;
 import com.cashigo.expensio.dto.CategoryDto;
 import com.cashigo.expensio.dto.Response;
 import com.cashigo.expensio.service.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Response<CategoryDto>> saveCategory(@RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<Response<CategoryDto>> saveCategory(@Valid @RequestBody CategoryDto categoryDto) {
         Response<CategoryDto> response = new Response<>();
         CategoryDto savedCategory = categoryService.saveAndUpdateCategory(categoryDto);
         response.setData(savedCategory);
@@ -42,7 +43,7 @@ public class CategoryController {
     }
 
     @PutMapping
-    public ResponseEntity<Response<CategoryDto>> updateCategory(@RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<Response<CategoryDto>> updateCategory(@Valid @RequestBody CategoryDto categoryDto) {
         Response<CategoryDto> response = new Response<>();
         CategoryDto savedCategory = categoryService.saveAndUpdateCategory(categoryDto);
         response.setData(savedCategory);

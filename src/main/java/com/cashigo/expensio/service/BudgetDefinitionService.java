@@ -3,11 +3,15 @@ package com.cashigo.expensio.service;
 import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.BudgetDefinitionDto;
 import com.cashigo.expensio.dto.exception.NoBudgetDefinitionFoundException;
+import com.cashigo.expensio.dto.exception.NoCategoryFoundException;
 import com.cashigo.expensio.dto.mapper.BudgetDefinitionMapper;
 import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.BudgetDefinition;
 import com.cashigo.expensio.repository.BudgetDefinitionRepository;
+import com.cashigo.expensio.repository.CategoryRepository;
+import com.cashigo.expensio.repository.SubCategoryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,6 +37,7 @@ public class BudgetDefinitionService {
     private final BudgetCycleService budgetCycleService;
     private final BudgetDefinitionMapper budgetDefinitionMapper;
     private final BudgetTrackingService budgetTrackingService;
+    private final CategoryRepository categoryRepository;
     private final UserContext userContext;
 
     public BudgetDefinitionDto getBudgetDefinitionById(UUID budgetDefinitionId) {
@@ -50,17 +55,22 @@ public class BudgetDefinitionService {
                 .stream().map(budgetDefinitionMapper::mapToDto).toList();
     }
 
+    @SneakyThrows
     public BudgetDefinitionDto saveBudgetDefinition(BudgetDefinitionDto unsavedBudgetDefinition) {
         String userId = userContext.getUserId();
         BudgetDefinition budgetDefinition = budgetDefinitionMapper.mapToEntity(unsavedBudgetDefinition);
         budgetDefinition.setUserId(userId);
+
+        Long categoryId = budgetDefinition.getCategory().getId();
+        boolean categoryExists = categoryRepository.existsCategoryByIdAndUserId(categoryId, userId);
+        if (!categoryExists)
+            throw new NoCategoryFoundException();
 
         BudgetCycle budgetCycle = budgetCycleService.createBudgetCycle(budgetDefinition);
         budgetDefinition.setBudgetCycles(new ArrayList<>(List.of(budgetCycle)));
 
         budgetDefinitionRepository.save(budgetDefinition);
 
-        Long categoryId = budgetDefinition.getCategory().getId();
         budgetTrackingService.addPreviousTransactionsToCurrentBudgetCycle(budgetCycle, categoryId);
 
         return budgetDefinitionMapper.mapToDto(budgetDefinition);

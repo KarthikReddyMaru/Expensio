@@ -2,6 +2,7 @@ package com.cashigo.expensio.dto;
 
 import com.cashigo.expensio.common.consts.TransactionRecurrence;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class TransactionDto {
     private UUID id;
+    @DecimalMin(value = "0.0", message = "Amount cannot be less than 0")
     private BigDecimal amount;
     private Long subCategoryId;
     private LocalDateTime transactionDateTime;
