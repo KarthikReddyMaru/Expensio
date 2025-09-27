@@ -30,7 +30,7 @@ public class TransactionSummaryService {
         String userId = userContext.getUserId();
         Sort sort = Sort.by("transactionDateTime").descending();
         Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
-        Page<Transaction> transactions = transactionRepository.findTransactionsByWithSubCategory(userId, pageable);
+        Page<Transaction> transactions = transactionRepository.findTransactionsOfUserWithSubCategories(userId, pageable);
         return transactions.stream().map(transactionToSummaryMapper::map).toList();
     }
 

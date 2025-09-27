@@ -15,7 +15,7 @@ import java.util.UUID;
 @Repository
 public interface BudgetCycleRepository extends JpaRepository<BudgetCycle, UUID> {
 
-    @Query("select bc from BudgetCycle bc join fetch bc.transactions where bc.id = :budgetCycleId")
+    @Query("select bc from BudgetCycle bc left join fetch bc.transactions where bc.id = :budgetCycleId")
     Optional<BudgetCycle> findTransactionsByCycleId(UUID budgetCycleId);
 
 }

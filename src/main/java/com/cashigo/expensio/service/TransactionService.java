@@ -8,7 +8,6 @@ import com.cashigo.expensio.dto.exception.NoTransactionFoundException;
 import com.cashigo.expensio.dto.mapper.TransactionMapper;
 import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.RecurringTransactionDefinition;
-import com.cashigo.expensio.model.SubCategory;
 import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.SubCategoryRepository;
 import com.cashigo.expensio.repository.TransactionRepository;
@@ -54,7 +53,7 @@ public class TransactionService {
         Sort sort = Sort.by("transactionDateTime").descending();
         Pageable pageRequest = PageRequest.of(pageNum, pageSize, sort);
         String userId = userContext.getUserId();
-        Page<Transaction> transactions = transactionRepository.findTransactionsByWithSubCategory(userId, pageRequest);
+        Page<Transaction> transactions = transactionRepository.findTransactionsOfUserWithSubCategories(userId, pageRequest);
         return transactions.stream().map(transactionMapper::mapToDto).toList();
     }
 

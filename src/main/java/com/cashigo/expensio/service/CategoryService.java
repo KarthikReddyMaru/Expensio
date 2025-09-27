@@ -28,7 +28,7 @@ public class CategoryService {
     public List<CategoryDto> getAllCategoriesByUserId() {
         String userId = userContext.getUserId();
         Sort sort = Sort.by("name").ascending();
-        List<Category> categories = categoryRepository.findCategoriesByUserIdOrSystem(userId, sort);
+        List<Category> categories = categoryRepository.findCategoriesByUserId(userId, sort);
         return categories.stream().map(categoryMapper::mapToDto).toList();
     }
 
