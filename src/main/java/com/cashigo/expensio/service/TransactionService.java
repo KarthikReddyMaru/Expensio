@@ -82,9 +82,7 @@ public class TransactionService {
         String userId = userContext.getUserId();
         transaction.setUserId(userId);
 
-        subCategoryRepository
-                .findSubCategoryById(transaction.getSubCategory().getId(), userId)
-                .orElseThrow(NoSubCategoryFoundException::new);
+        setBudgetCycle(transaction, userId);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
         return transactionMapper.mapToDto(savedTransaction);
@@ -100,8 +98,7 @@ public class TransactionService {
     private void setBudgetCycle(Transaction transaction, String userId) {
         Long subCategoryId = transaction.getSubCategory().getId();
         BudgetCycle budgetCycle = budgetCycleService.getActiveBudgetCycleBySubCategoryId(subCategoryId, userId);
-        if (budgetCycle != null)
-            transaction.setBudgetCycle(budgetCycle);
+        transaction.setBudgetCycle(budgetCycle);
     }
 
     private void setRecurringTransaction(TransactionRecurrence transactionRecurrence, Transaction transaction) {
