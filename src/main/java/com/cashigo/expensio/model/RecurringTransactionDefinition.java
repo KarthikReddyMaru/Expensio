@@ -16,8 +16,10 @@ import java.util.UUID;
 @ToString(exclude = {"transactions"})
 @Table(
         name = "RecurringTransactions",
-        indexes =
-                @Index(name = "next_occurrence_idx", columnList = "nextOccurrence")
+        indexes = {
+                @Index(name = "next_occurrence_idx", columnList = "nextOccurrence"),
+                @Index(name = "user_id_idx", columnList = "user_id")
+        }
 )
 public class RecurringTransactionDefinition {
 
@@ -32,7 +34,12 @@ public class RecurringTransactionDefinition {
     private BigDecimal amount = BigDecimal.ZERO;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(foreignKey =
+        @ForeignKey(
+                name = "fk_subcategory",
+                foreignKeyDefinition = "FOREIGN KEY (sub_category_id) REFERENCES sub_category(id) ON DELETE CASCADE"
+        )
+    )
     private SubCategory subCategory;
 
     @Column(nullable = false, updatable = false)
