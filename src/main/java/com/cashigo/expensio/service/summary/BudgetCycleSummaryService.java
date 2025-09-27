@@ -1,8 +1,11 @@
 package com.cashigo.expensio.service.summary;
 
+import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.exception.NoBudgetCycleFoundException;
 import com.cashigo.expensio.dto.summary.BudgetCycleSummaryDto;
+import com.cashigo.expensio.dto.summary.TransactionSummaryDto;
 import com.cashigo.expensio.dto.summary.mapper.BudgetCycleToSummaryMapper;
+import com.cashigo.expensio.dto.summary.mapper.TransactionToSummaryMapper;
 import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.BudgetCycleRepository;
@@ -10,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -18,10 +22,13 @@ public class BudgetCycleSummaryService {
 
     private final BudgetCycleRepository budgetCycleRepository;
     private final BudgetCycleToSummaryMapper budgetCycleToSummaryMapper;
+    private final TransactionToSummaryMapper transactionSummaryMapper;
+    private final UserContext userContext;
 
     public BudgetCycleSummaryDto getBudgetCycleSummaryById(UUID budgetCycleId) {
+        String userId = userContext.getUserId();
         BudgetCycle budgetCycle = budgetCycleRepository
-                .findById(budgetCycleId)
+                .findBudgetCycleById(budgetCycleId, userId)
                 .orElseThrow(NoBudgetCycleFoundException::new);
         BudgetCycleSummaryDto budgetCycleDto = budgetCycleToSummaryMapper.map(budgetCycle);
         BigDecimal amountSpent = getAmountSpentInCycle(budgetCycleId);
@@ -30,14 +37,26 @@ public class BudgetCycleSummaryService {
     }
 
     public BigDecimal getAmountSpentInCycle(UUID budgetCycleId) {
-        BudgetCycle transactions = budgetCycleRepository
-                .findTransactionsByCycleId(budgetCycleId)
+        BudgetCycle budgetCycle = budgetCycleRepository
+                .findBudgetCycleWithTransactionsByCycleId(budgetCycleId)
                 .orElseThrow(NoBudgetCycleFoundException::new);
-        return transactions
+        return budgetCycle
                 .getTransactions()
                 .stream()
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public List<TransactionSummaryDto> getTransactionsInCycle(UUID cycleId) {
+        String userId = userContext.getUserId();
+        BudgetCycle budgetCycle = budgetCycleRepository
+                .findBudgetCycleWithTransactionsByCycleId(cycleId, userId)
+                .orElseThrow(NoBudgetCycleFoundException::new);
+        return budgetCycle
+                .getTransactions()
+                .stream()
+                .map(transactionSummaryMapper::map)
+                .toList();
     }
 
 }
