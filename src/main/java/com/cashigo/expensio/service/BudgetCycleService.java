@@ -65,6 +65,26 @@ public class BudgetCycleService {
                 .orElse(null);
     }
 
+    public BudgetCycle getBudgetCycleByInstant(Long subCategoryId, Instant transactionInstant, String userId) {
+        SubCategoryDto subCategory = subCategoryService.getSubCategoryById(subCategoryId);
+        Long categoryId = subCategory.getCategoryId();
+        BudgetDefinition budgetDefinition = budgetDefinitionRepository
+                .findBudgetDefinitionByCategoryAndDateRangeWithCycles(categoryId, transactionInstant, userId)
+                .orElse(null);
+
+        if (budgetDefinition == null) return null;
+
+        return budgetDefinition
+                .getBudgetCycles()
+                .stream()
+                .filter(cycle ->
+                        !transactionInstant.isBefore(cycle.getCycleStartDateTime()) &&
+                                !transactionInstant.isAfter(cycle.getCycleEndDateTime())
+                )
+                .findFirst()
+                .orElse(null);
+    }
+
     public BudgetCycle createBudgetCycle(BudgetDefinition budgetDefinition) {
 
         LocalDate cycleStartDate, cycleEndDate;

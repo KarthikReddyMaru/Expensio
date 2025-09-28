@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -97,10 +98,9 @@ public class TransactionService {
 
     private void setBudgetCycle(Transaction transaction, String userId) {
         Long subCategoryId = transaction.getSubCategory().getId();
-        BudgetCycle budgetCycle = budgetCycleService.getActiveBudgetCycleBySubCategoryId(subCategoryId, userId);
-        if (transaction.getTransactionDateTime().isBefore(budgetCycle.getCycleEndDateTime()) &&
-                transaction.getTransactionDateTime().isAfter(budgetCycle.getCycleStartDateTime()))
-            transaction.setBudgetCycle(budgetCycle);
+        Instant transactionInstant = transaction.getTransactionDateTime();
+        BudgetCycle budgetCycle = budgetCycleService.getBudgetCycleByInstant(subCategoryId, transactionInstant, userId);
+        transaction.setBudgetCycle(budgetCycle);
     }
 
     private void setRecurringTransaction(TransactionRecurrence transactionRecurrence, Transaction transaction) {
