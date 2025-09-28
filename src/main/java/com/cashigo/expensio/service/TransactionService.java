@@ -68,7 +68,8 @@ public class TransactionService {
         TransactionRecurrence transactionRecurrence = unsavedTransaction.getTransactionRecurrenceType();
         setRecurringTransaction(transactionRecurrence, transaction);
 
-        setBudgetCycle(transaction, userId);
+        if (transaction.getSubCategory() != null)
+            setBudgetCycle(transaction, userId);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
         log.info("Transaction of {} saved with id {}", userContext.getUserName(), savedTransaction.getId());
@@ -83,7 +84,8 @@ public class TransactionService {
         String userId = userContext.getUserId();
         transaction.setUserId(userId);
 
-        setBudgetCycle(transaction, userId);
+        if (transaction.getSubCategory() != null)
+            setBudgetCycle(transaction, userId);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
         return transactionMapper.mapToDto(savedTransaction);
