@@ -22,7 +22,7 @@ public class BudgetDefinitionSummaryService {
 
     public List<BudgetDefinitionSummaryDto> getBudgetDefinitionSummaries() {
         String userId = userContext.getUserId();
-        List<BudgetDefinition> budgetDefinition = budgetDefinitionRepository.findUserBudgetDefinitionsWithCycles(userId);
+        List<BudgetDefinition> budgetDefinition = budgetDefinitionRepository.findBudgetDefinitionsWithCycles(userId);
         return budgetDefinition
                 .stream()
                 .map(budgetDefinitionToSummaryMapper::map)
