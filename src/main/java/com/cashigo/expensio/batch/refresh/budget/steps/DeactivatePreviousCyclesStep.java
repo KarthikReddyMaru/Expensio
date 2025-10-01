@@ -1,11 +1,14 @@
-package com.cashigo.expensio.batch;
+package com.cashigo.expensio.batch.refresh.budget.steps;
 
+import com.cashigo.expensio.batch.refresh.budget.model.BudgetRefreshRecord;
+import com.cashigo.expensio.common.consts.BudgetRecurrence;
 import com.cashigo.expensio.dto.mapper.UUIDMapper;
 import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.BudgetDefinition;
 import com.cashigo.expensio.repository.BudgetCycleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.repository.JobRepository;
@@ -23,11 +26,11 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.*;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class DeactivatePreviousCyclesStep {
@@ -41,6 +44,8 @@ public class DeactivatePreviousCyclesStep {
 
     @Value("${batch.chunk.size}")
     private int chunkSize;
+    @Value("${zone.id}")
+    private String zone;
 
     @Bean(name = "deactivatePreviousCycles")
     Step deactivatePreviousCycles(
@@ -68,8 +73,10 @@ public class DeactivatePreviousCyclesStep {
 
         itemReader.setQueryProvider(provider.getObject());
         itemReader.setRowMapper(budgetDefinitionRowMapper());
-        itemReader.setParameterValues(Map.of("recurrenceType", recurrenceType));
-
+        itemReader.setParameterValues(Map.of(
+                "recurrenceType", recurrenceType,
+                "end", getCycleEnd(BudgetRecurrence.valueOf(recurrenceType))
+        ));
         return itemReader;
     }
 
@@ -84,7 +91,7 @@ public class DeactivatePreviousCyclesStep {
         """);
         provider.setFromClause("""
                 from budget_definition bd
-                join budget_cycle bc on bd.id = bc.budget_definition_id and bc.is_active = 1
+                join budget_cycle bc on bd.id = bc.budget_definition_id and bc.is_active = 1 and bc.cycle_end_date_time < :end
         """);
         provider.setWhereClause("budget_recurrence_type = :recurrenceType");
         provider.setSortKey("budget_def_id");
@@ -98,9 +105,9 @@ public class DeactivatePreviousCyclesStep {
             UUID budgetDefinitionId = uUIDMapper.map(rs.getBytes("budget_def_id"));
             UUID budgetCycleId = uUIDMapper.map(rs.getBytes("budget_cycle_id"));
 
-            Timestamp cycleStart = rs.getTimestamp("start");
+            Timestamp cycleStart = rs.getTimestamp("start", Calendar.getInstance(TimeZone.getTimeZone("UTC")));
             Instant start = cycleStart != null ? cycleStart.toInstant() : null;
-            Timestamp cycleEnd = rs.getTimestamp("end");
+            Timestamp cycleEnd = rs.getTimestamp("end", Calendar.getInstance(TimeZone.getTimeZone("UTC")));
             Instant end = cycleEnd != null ? cycleEnd.toInstant() : null;
 
             String userId = rs.getString("user_id");
@@ -132,6 +139,18 @@ public class DeactivatePreviousCyclesStep {
             List<? extends BudgetCycle> previousActiveCycles = chunk.getItems();
             budgetCycleRepository.saveAll(previousActiveCycles);
         };
+    }
+
+    Instant getCycleEnd(BudgetRecurrence budgetRecurrence) {
+        ZoneId zoneId = ZoneId.of(zone);
+        LocalDate localDate = null;
+        if (budgetRecurrence.equals(BudgetRecurrence.WEEKLY))
+            localDate = LocalDate.now(zoneId).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        else if (budgetRecurrence.equals(BudgetRecurrence.MONTHLY))
+            localDate = LocalDate.now(zoneId).with(TemporalAdjusters.firstDayOfMonth());
+        if (localDate != null)
+            return localDate.atStartOfDay(zoneId).toInstant();
+        return null;
     }
 
 }

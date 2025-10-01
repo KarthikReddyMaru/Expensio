@@ -6,17 +6,14 @@ import com.cashigo.expensio.model.BudgetDefinition;
 import com.cashigo.expensio.repository.BudgetCycleRepository;
 import com.cashigo.expensio.repository.BudgetDefinitionRepository;
 import com.cashigo.expensio.service.BudgetCycleService;
-import com.cashigo.expensio.service.BudgetDefinitionService;
 import com.cashigo.expensio.service.BudgetTrackingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 //@Service
@@ -52,7 +49,7 @@ public class BudgetRefreshScheduler {
                 .toList();
         List<BudgetCycle> budgetCycles = budgetCycleRepository.saveAll(refreshedBudgetCycles);
 
-        budgetCycles.forEach(budgetTrackingService::addPreviousTransactionsToCurrentBudgetCycle);
+        budgetCycles.forEach(budgetTrackingService::getTransactionsOfCurrentBudgetCycle);
 
         log.info("Scheduler ends..");
     }

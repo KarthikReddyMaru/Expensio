@@ -7,8 +7,10 @@ import com.cashigo.expensio.dto.exception.NoCategoryFoundException;
 import com.cashigo.expensio.dto.mapper.BudgetDefinitionMapper;
 import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.BudgetDefinition;
+import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.BudgetDefinitionRepository;
 import com.cashigo.expensio.repository.CategoryRepository;
+import com.cashigo.expensio.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +38,9 @@ public class BudgetDefinitionService {
     private final BudgetCycleService budgetCycleService;
     private final BudgetDefinitionMapper budgetDefinitionMapper;
     private final BudgetTrackingService budgetTrackingService;
+
     private final CategoryRepository categoryRepository;
+    private final TransactionRepository transactionRepository;
     private final UserContext userContext;
 
     public BudgetDefinitionDto getBudgetDefinitionById(UUID budgetDefinitionId) {
@@ -70,7 +74,8 @@ public class BudgetDefinitionService {
 
         budgetDefinitionRepository.save(budgetDefinition);
 
-        budgetTrackingService.addPreviousTransactionsToCurrentBudgetCycle(budgetCycle);
+        List<Transaction> transactions = budgetTrackingService.getTransactionsOfCurrentBudgetCycle(budgetCycle);
+        transactionRepository.saveAll(transactions);
 
         return budgetDefinitionMapper.mapToDto(budgetDefinition);
     }

@@ -1,4 +1,4 @@
-package com.cashigo.expensio.batch.scheduler;
+package com.cashigo.expensio.batch.refresh.budget;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class BudgetRefreshScheduler {
 
 
     @SneakyThrows
-    @Scheduled(cron = "0 */2 * * * *")
+    @Scheduled(cron = "0 0 1 * * 1")
     public void launchWeeklyBudgetCycleRefresh() {
         log.info("Weekly Scheduler...");
         JobParameters jobParameters = new JobParametersBuilder()

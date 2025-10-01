@@ -1,4 +1,4 @@
-package com.cashigo.expensio.batch;
+package com.cashigo.expensio.batch.refresh.budget;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -14,13 +14,16 @@ public class BudgetRefreshBatch {
     private final JobRepository jobRepository;
     private final Step deactivatePreviousCyclesStep;
     private final Step createActiveCycles;
+    private final Step addPreviousTransactions;
 
     public BudgetRefreshBatch(JobRepository jobRepository,
                               @Qualifier("deactivatePreviousCycles") Step deactivatePreviousCyclesStep,
-                              @Qualifier("createActiveCycles") Step createActiveCycles) {
+                              @Qualifier("createActiveCycles") Step createActiveCycles,
+                              @Qualifier("addPreviousTransactions") Step addPreviousTransactions) {
         this.jobRepository = jobRepository;
         this.deactivatePreviousCyclesStep = deactivatePreviousCyclesStep;
         this.createActiveCycles = createActiveCycles;
+        this.addPreviousTransactions = addPreviousTransactions;
     }
 
     @Bean(name = "refreshWeeklyBudgets")
@@ -28,6 +31,7 @@ public class BudgetRefreshBatch {
         return new JobBuilder("RefreshWeeklyBudgets", jobRepository)
                 .start(deactivatePreviousCyclesStep)
                 .next(createActiveCycles)
+                .next(addPreviousTransactions)
                 .build();
     }
 

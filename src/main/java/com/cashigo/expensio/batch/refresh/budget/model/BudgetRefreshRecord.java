@@ -1,4 +1,4 @@
-package com.cashigo.expensio.batch;
+package com.cashigo.expensio.batch.refresh.budget.model;
 
 import java.time.Instant;
 import java.util.UUID;

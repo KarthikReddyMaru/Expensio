@@ -14,7 +14,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-//@Configuration
+@Configuration
 public class BootConfig {
 
     private SubCategory createSubCategory(String name, Category category) {

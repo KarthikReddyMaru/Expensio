@@ -1,4 +1,4 @@
-package com.cashigo.expensio.batch;
+package com.cashigo.expensio.batch.refresh.budget.steps;
 
 import com.cashigo.expensio.common.consts.BudgetRecurrence;
 import com.cashigo.expensio.dto.mapper.UUIDMapper;
