@@ -35,5 +35,13 @@ public class BudgetRefreshBatch {
                 .build();
     }
 
+    @Bean(name = "refreshMonthlyBudgets")
+    Job refreshMonthlyBudgets() {
+        return new JobBuilder("RefreshMonthlyBudgets", jobRepository)
+                .start(deactivatePreviousCyclesStep)
+                .next(createActiveCycles)
+                .next(addPreviousTransactions)
+                .build();
+    }
 
 }
