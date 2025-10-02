@@ -11,8 +11,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/batch")
@@ -21,13 +24,16 @@ public class BatchLauncher {
     private final JobLauncher jobLauncher;
     private final Job refreshWeeklyBudgets;
     private final Job refreshMonthlyBudgets;
+    private final Job processRecurringTransactions;
 
     public BatchLauncher(JobLauncher jobLauncher,
                          @Qualifier("refreshWeeklyBudgets") Job refreshWeeklyBudgets,
-                         @Qualifier("refreshMonthlyBudgets") Job refreshMonthlyBudgets) {
+                         @Qualifier("refreshMonthlyBudgets") Job refreshMonthlyBudgets,
+                         @Qualifier("processRecurringTransactions") Job processRecurringTransactions) {
         this.jobLauncher = jobLauncher;
         this.refreshWeeklyBudgets = refreshWeeklyBudgets;
         this.refreshMonthlyBudgets = refreshMonthlyBudgets;
+        this.processRecurringTransactions = processRecurringTransactions;
     }
 
     @GetMapping("/budget/week")
@@ -47,6 +53,16 @@ public class BatchLauncher {
                 .addJobParameter("recurrenceType", new JobParameter<>(BudgetRecurrence.MONTHLY.name(), String.class))
                 .toJobParameters();
         jobLauncher.run(refreshMonthlyBudgets, jobParameters);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/transactions/{date}")
+    @SneakyThrows
+    public ResponseEntity<Void> processRecurringTransactions(@PathVariable LocalDate date) {
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addJobParameter("nextOccurrence",new JobParameter<>(date, LocalDate.class))
+                .toJobParameters();
+        jobLauncher.run(processRecurringTransactions, jobParameters);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

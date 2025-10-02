@@ -102,8 +102,8 @@ public class DeactivatePreviousCyclesStep {
 
         return (rs, row) -> {
 
-            UUID budgetDefinitionId = uUIDMapper.map(rs.getBytes("budget_def_id"));
-            UUID budgetCycleId = uUIDMapper.map(rs.getBytes("budget_cycle_id"));
+            UUID budgetDefinitionId = uUIDMapper.mapToUUID(rs.getBytes("budget_def_id"));
+            UUID budgetCycleId = uUIDMapper.mapToUUID(rs.getBytes("budget_cycle_id"));
 
             Timestamp cycleStart = rs.getTimestamp("start", Calendar.getInstance(TimeZone.getTimeZone("UTC")));
             Instant start = cycleStart != null ? cycleStart.toInstant() : null;

@@ -82,14 +82,12 @@ public class AddCycleTransactionsStep {
 
     @Bean
     ItemWriter<List<Transaction>> saveTransactionsWithCycle() {
-        return transactions -> {
-            transactions
-                    .getItems()
-                    .forEach(transactionRepository::saveAll);
-        };
+        return transactions -> transactions
+                .getItems()
+                .forEach(transactionRepository::saveAll);
     }
 
-    @Bean
+    @Bean(name = "activeCyclePagingQuery")
     SqlPagingQueryProviderFactoryBean activeCyclePagingQuery() {
         SqlPagingQueryProviderFactoryBean provider = new SqlPagingQueryProviderFactoryBean();
         provider.setDataSource(dataSource);
@@ -119,7 +117,7 @@ public class AddCycleTransactionsStep {
     }
 
     private BudgetCycle getBudgetCycle(ResultSet rs, BudgetDefinition budgetDefinition) throws SQLException {
-        UUID budgetCycleId = uuidMapper.map(rs.getBytes("budget_cycle_id"));
+        UUID budgetCycleId = uuidMapper.mapToUUID(rs.getBytes("budget_cycle_id"));
         Timestamp start_time = rs.getTimestamp("start_date_time", Calendar.getInstance(TimeZone.getTimeZone("UTC")));
         Timestamp end_time = rs.getTimestamp("end_date_time", Calendar.getInstance(TimeZone.getTimeZone("UTC")));
         Instant start = start_time != null ? start_time.toInstant() : null;
@@ -134,7 +132,7 @@ public class AddCycleTransactionsStep {
 
     private BudgetDefinition getBudgetDefinition(ResultSet rs) throws SQLException {
         Category category = getCategory(rs);
-        UUID budgetDefinitionId = uuidMapper.map(rs.getBytes("budget_def_id"));
+        UUID budgetDefinitionId = uuidMapper.mapToUUID(rs.getBytes("budget_def_id"));
         String userId = rs.getString("user_id");
         BudgetDefinition budgetDefinition = new BudgetDefinition();
         budgetDefinition.setId(budgetDefinitionId);

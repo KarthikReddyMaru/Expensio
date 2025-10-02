@@ -100,7 +100,7 @@ public class CreateActiveCyclesStep {
 
     private RowMapper<BudgetDefinition> rowMapper(String recurrenceType) {
         return (rs, row) -> {
-            UUID budgetDefinitionId = uuidMapper.map(rs.getBytes("id"));
+            UUID budgetDefinitionId = uuidMapper.mapToUUID(rs.getBytes("id"));
             BudgetDefinition budgetDefinition = new BudgetDefinition();
             budgetDefinition.setId(budgetDefinitionId);
             budgetDefinition.setBudgetRecurrenceType(BudgetRecurrence.valueOf(recurrenceType));
