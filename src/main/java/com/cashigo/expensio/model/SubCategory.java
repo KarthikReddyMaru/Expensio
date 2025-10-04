@@ -13,7 +13,7 @@ import java.time.Instant;
         uniqueConstraints =
                 @UniqueConstraint(name = "no_duplicate_subCat_per_cat_unq", columnNames = {"name", "category_id"}),
         indexes =
-                @Index(name = "category_idx", columnList = "category_id")
+                @Index(name = "subCat_category_idx", columnList = "category_id")
 )
 @Data
 public class SubCategory {
