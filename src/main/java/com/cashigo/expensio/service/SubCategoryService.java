@@ -97,7 +97,7 @@ public class SubCategoryService {
         if (subCategoryId <= systemSubCategories)
             throw new SystemPropertiesCannotBeModifiedException();
         String userId = userContext.getUserId();
-        subCategoryRepository.deleteSubCategoryByIdAndCategory_UserId(subCategoryId, userId);
+        subCategoryRepository.deleteSubCategoryByIdAndUserId(subCategoryId, userId);
         log.info("Sub Category of {} with id {} is deleted",
                 userContext.getUserName(), subCategoryId);
     }

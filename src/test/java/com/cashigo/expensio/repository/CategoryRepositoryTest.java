@@ -127,7 +127,7 @@ public class CategoryRepositoryTest {
     }
 
     @Test
-    void whenCategoryExistsById_thenTrueReturned() {
+    void whenSystemCategoryExistsById_thenTrueReturned() {
         boolean found = categoryRepository.existsCategoryById(systemCategoryId, userId);
         assertThat(found).isTrue();
     }
@@ -170,6 +170,35 @@ public class CategoryRepositoryTest {
         assertThat(
                 categoryRepository.existsCategoryById(savedCategory.getId(), userId)
         ).isFalse();
+    }
+
+    @Test
+    void whenDeletingOtherUserCategory_thenCategoryShouldNotBeDeleted() {
+        String otherUserId = UUID.randomUUID().toString();
+        Category category = createCustomCategory("CategoryOfOtherUser");
+        category.setUserId(otherUserId);
+        Category savedCategory = categoryRepository.save(category);
+        Long savedCategoryId = savedCategory.getId();
+
+        Category fetchSavedCategory = categoryRepository.findCategoryById(savedCategoryId, otherUserId).orElseThrow();
+
+        assertThat(fetchSavedCategory)
+                .satisfies((fetchedCategory) -> {
+                    assertThat(fetchedCategory.getId()).isEqualTo(savedCategoryId);
+                    assertThat(fetchedCategory.getName()).isEqualTo("CategoryOfOtherUser");
+                    assertThat(fetchedCategory.getUserId()).isEqualTo(otherUserId);
+                });
+
+        categoryRepository.deleteCategoryByIdAndUserId(savedCategoryId, userId);
+
+        fetchSavedCategory = categoryRepository.findCategoryById(savedCategoryId, otherUserId).orElseThrow();
+
+        assertThat(fetchSavedCategory)
+                .satisfies((fetchedCategory) -> {
+                    assertThat(fetchedCategory.getId()).isEqualTo(savedCategoryId);
+                    assertThat(fetchedCategory.getName()).isEqualTo("CategoryOfOtherUser");
+                    assertThat(fetchedCategory.getUserId()).isEqualTo(otherUserId);
+                });
     }
 
     Category createCustomCategory(String name) {

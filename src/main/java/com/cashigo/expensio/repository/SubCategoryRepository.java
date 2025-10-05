@@ -19,6 +19,6 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Long> 
     """)
     boolean existsSubCategoriesById(Long subCategoryId, String userId);
 
-    void deleteSubCategoryByIdAndCategory_UserId(Long subCategoryId, String categoryUserId);
+    void deleteSubCategoryByIdAndUserId(Long id, String userId);
 
 }
