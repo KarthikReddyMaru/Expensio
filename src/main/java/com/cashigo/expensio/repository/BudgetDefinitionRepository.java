@@ -16,25 +16,25 @@ public interface BudgetDefinitionRepository extends JpaRepository<BudgetDefiniti
 
     Optional<BudgetDefinition> findBudgetDefinitionByIdAndUserId(UUID id, String userId);
 
-    @Query("select distinct bd from BudgetDefinition bd join fetch bd.budgetCycles where bd.userId = :userId and bd.category.id = :categoryId")
+    @Query("select distinct bd from BudgetDefinition bd left join fetch bd.budgetCycles where bd.userId = :userId and bd.category.id = :categoryId")
     Optional<BudgetDefinition> findBudgetDefinitionByCategoryWithCycles(Long categoryId, String userId);
 
     @Query("""
         select distinct bd from BudgetDefinition bd
-            join fetch bd.budgetCycles bc
+            left join fetch bd.budgetCycles bc
         where bd.userId = :userId and bd.category.id = :categoryId and :instant between bc.cycleStartDateTime and bc.cycleEndDateTime
     """)
     Optional<BudgetDefinition> findBudgetDefinitionByCategoryAndDateRangeWithCycles(Long categoryId, Instant instant, String userId);
 
     List<BudgetDefinition> findBudgetDefinitionsByUserId(String userId);
 
-    @Query("select distinct bd from BudgetDefinition bd join fetch bd.budgetCycles where bd.budgetRecurrenceType = :budgetRecurrenceType")
+    @Query("select distinct bd from BudgetDefinition bd left join fetch bd.budgetCycles where bd.budgetRecurrenceType = :budgetRecurrenceType")
     List<BudgetDefinition> findBudgetDefinitionsByBudgetRecurrenceTypeWithCycles(BudgetRecurrence budgetRecurrenceType);
 
-    @Query("select distinct bd from BudgetDefinition bd join fetch bd.budgetCycles where bd.userId = :userId")
+    @Query("select distinct bd from BudgetDefinition bd left join fetch bd.budgetCycles where bd.userId = :userId")
     List<BudgetDefinition> findBudgetDefinitionsWithCycles(String userId);
 
-    @Query("select distinct bd from BudgetDefinition bd join fetch bd.budgetCycles where bd.userId = :userId and bd.id = :id")
+    @Query("select distinct bd from BudgetDefinition bd left join fetch bd.budgetCycles where bd.userId = :userId and bd.id = :id")
     Optional<BudgetDefinition> findBudgetDefinitionByIdWithCycles(UUID id, String userId);
 
     void deleteBudgetDefinitionByIdAndUserId(UUID id, String userId);
