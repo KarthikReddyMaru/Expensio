@@ -55,6 +55,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     """, nativeQuery = true)
     List<ReportProjection> findTransactionReportByInstantRange(Instant start, Instant end, String userId);
 
+    boolean existsByIdAndUserId(UUID id, String userId);
+
     void deleteByIdAndUserId(UUID id, String userId);
     
 }

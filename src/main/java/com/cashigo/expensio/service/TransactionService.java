@@ -3,15 +3,14 @@ package com.cashigo.expensio.service;
 import com.cashigo.expensio.common.consts.TransactionRecurrence;
 import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.TransactionDto;
-import com.cashigo.expensio.dto.exception.NoSubCategoryFoundException;
 import com.cashigo.expensio.dto.exception.NoTransactionFoundException;
 import com.cashigo.expensio.dto.mapper.TransactionMapper;
 import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.RecurringTransactionDefinition;
 import com.cashigo.expensio.model.Transaction;
-import com.cashigo.expensio.repository.SubCategoryRepository;
 import com.cashigo.expensio.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,11 +33,11 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
-    private final SubCategoryRepository subCategoryRepository;
     private final RecurringTransactionService recurringTransactionService;
     private final BudgetCycleService budgetCycleService;
     private final UserContext userContext;
 
+    @Setter
     @Value("${page.size}")
     private int pageSize;
 
@@ -66,13 +65,13 @@ public class TransactionService {
         transaction.setUserId(userId);
 
         TransactionRecurrence transactionRecurrence = unsavedTransaction.getTransactionRecurrenceType();
-        setRecurringTransaction(transactionRecurrence, transaction);
+        if (transactionRecurrence != null && !transactionRecurrence.equals(TransactionRecurrence.NONE))
+            setRecurringTransaction(transactionRecurrence, transaction);
 
         if (transaction.getSubCategory() != null)
             setBudgetCycle(transaction, userId);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
-        log.info("Transaction of {} saved with id {}", userContext.getUserName(), savedTransaction.getId());
         return transactionMapper.mapToDto(savedTransaction);
     }
 
@@ -83,6 +82,11 @@ public class TransactionService {
         Transaction transaction = transactionMapper.mapToEntity(transactionDto);
         String userId = userContext.getUserId();
         transaction.setUserId(userId);
+
+        boolean isTransactionBelongsToUser =
+                transactionRepository.existsByIdAndUserId(transaction.getId(), userId);
+        if (!isTransactionBelongsToUser)
+            throw new NoTransactionFoundException();
 
         if (transaction.getSubCategory() != null)
             setBudgetCycle(transaction, userId);
@@ -98,19 +102,17 @@ public class TransactionService {
         transactionRepository.deleteByIdAndUserId(transactionId, userId);
     }
 
-    private void setBudgetCycle(Transaction transaction, String userId) {
+    public void setBudgetCycle(Transaction transaction, String userId) {
         Long subCategoryId = transaction.getSubCategory().getId();
         Instant transactionInstant = transaction.getTransactionDateTime();
         BudgetCycle budgetCycle = budgetCycleService.getBudgetCycleByInstant(subCategoryId, transactionInstant, userId);
         transaction.setBudgetCycle(budgetCycle);
     }
 
-    private void setRecurringTransaction(TransactionRecurrence transactionRecurrence, Transaction transaction) {
-        if (transactionRecurrence != null && !transactionRecurrence.equals(TransactionRecurrence.NONE)) {
-            RecurringTransactionDefinition recurringTransactionDefinition =
-                    recurringTransactionService.createRecurringTransactionDefinition(transaction, transactionRecurrence);
-            transaction.setTransactionDefinition(recurringTransactionDefinition);
-        }
+    public void setRecurringTransaction(TransactionRecurrence transactionRecurrence, Transaction transaction) {
+        RecurringTransactionDefinition recurringTransactionDefinition =
+                recurringTransactionService.createRecurringTransactionDefinition(transaction, transactionRecurrence);
+        transaction.setTransactionDefinition(recurringTransactionDefinition);
     }
 
 }

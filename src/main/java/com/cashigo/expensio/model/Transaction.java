@@ -38,7 +38,7 @@ public class Transaction {
     @JoinColumn(foreignKey =
         @ForeignKey(
             name = "fk_sub_category",
-            foreignKeyDefinition = "FOREIGN KEY (sub_category_id) REFERENCES Sub_category (id) ON DELETE SET NULL"
+            foreignKeyDefinition = "FOREIGN KEY (sub_category_id) REFERENCES sub_category (id) ON DELETE SET NULL"
         ))
     private SubCategory subCategory;
 
@@ -59,7 +59,7 @@ public class Transaction {
     @JoinColumn(foreignKey =
         @ForeignKey(
                 name = "fk_budget_definition_cycle",
-                foreignKeyDefinition = "FOREIGN KEY (budget_cycle_id) REFERENCES Budget_cycle(id) ON DELETE SET NULL"
+                foreignKeyDefinition = "FOREIGN KEY (budget_cycle_id) REFERENCES budget_cycle(id) ON DELETE SET NULL"
         ))
     private BudgetCycle budgetCycle;
 
