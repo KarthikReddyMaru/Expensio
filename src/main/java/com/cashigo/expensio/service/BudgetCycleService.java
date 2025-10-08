@@ -9,6 +9,7 @@ import com.cashigo.expensio.model.BudgetDefinition;
 import com.cashigo.expensio.repository.BudgetCycleRepository;
 import com.cashigo.expensio.repository.BudgetDefinitionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BudgetCycleService {
 
+    @Setter
     @Value("${zone.id}")
     private String zone;
 
@@ -98,7 +100,7 @@ public class BudgetCycleService {
             cycleStartDate = now.with(TemporalAdjusters.firstDayOfMonth());
             cycleEndDate = now.with(TemporalAdjusters.lastDayOfMonth());
         } else
-            throw new NotValidRecurrenceException();
+            return null;
 
         Instant cycleStartInstant = cycleStartDate.atStartOfDay(zoneId).toInstant();
         Instant cycleEndInstant = cycleEndDate.atTime(LocalTime.MAX).atZone(zoneId).toInstant().truncatedTo(ChronoUnit.SECONDS);
