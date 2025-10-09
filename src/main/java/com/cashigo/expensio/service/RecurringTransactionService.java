@@ -7,6 +7,7 @@ import com.cashigo.expensio.model.RecurringTransactionDefinition;
 import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.RecurringTransactionDefinitionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class RecurringTransactionService {
-    
+
+    @Setter
     @Value("${zone.id}")
     private String zone;
     private final RecurringTransactionDefinitionRepository transactionDefinitionRepository;
