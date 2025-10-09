@@ -11,6 +11,7 @@ import com.cashigo.expensio.model.SubCategory;
 import com.cashigo.expensio.repository.CategoryRepository;
 import com.cashigo.expensio.repository.SubCategoryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SubCategoryService {
 
+    @Setter
     @Value("${system.sub.categories}")
     private Long systemSubCategories;
 
@@ -71,8 +73,6 @@ public class SubCategoryService {
         SubCategory subCategory = subCategoryMapper.mapToEntity(unsavedSubCategory);
         subCategory.setUserId(userId);
         SubCategory savedSubCategory = subCategoryRepository.save(subCategory);
-        log.info("Sub category of {} is saved/updated in category (Id: {})",
-                userContext.getUserName(), savedSubCategory.getCategory().getId());
         return subCategoryMapper.mapToDto(savedSubCategory);
     }
 
@@ -94,12 +94,10 @@ public class SubCategoryService {
 
     @Transactional
     public void deleteSubCategory(Long subCategoryId) {
+        String userId = userContext.getUserId();
         if (subCategoryId <= systemSubCategories)
             throw new SystemPropertiesCannotBeModifiedException();
-        String userId = userContext.getUserId();
         subCategoryRepository.deleteSubCategoryByIdAndUserId(subCategoryId, userId);
-        log.info("Sub Category of {} with id {} is deleted",
-                userContext.getUserName(), subCategoryId);
     }
 
 }

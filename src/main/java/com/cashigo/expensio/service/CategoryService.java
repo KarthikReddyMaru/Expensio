@@ -8,6 +8,7 @@ import com.cashigo.expensio.dto.mapper.CategoryMapper;
 import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,7 @@ public class CategoryService {
     private final CategoryMapper categoryMapper;
     private final UserContext userContext;
 
+    @Setter
     @Value("${system.categories}")
     private Long systemCategories;
 

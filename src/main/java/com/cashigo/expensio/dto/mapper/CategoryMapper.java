@@ -22,16 +22,6 @@ public class CategoryMapper implements BiMapper<CategoryDto, Category> {
         category.setName(dto.getName());
         category.setSystem(dto.isSystem());
 
-        if (dto.getSubCategories() != null) {
-            category.setSubCategories(
-                    dto.getSubCategories()
-                            .stream()
-                            .map(subCategoryMapper::mapToEntity)
-                            .peek(sub -> sub.setCategory(category)) // set parent
-                            .collect(Collectors.toList())
-            );
-        }
-
         return category;
     }
 
