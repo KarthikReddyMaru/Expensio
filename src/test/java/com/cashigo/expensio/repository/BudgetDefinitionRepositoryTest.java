@@ -1,6 +1,7 @@
 package com.cashigo.expensio.repository;
 
 import com.cashigo.expensio.common.consts.BudgetRecurrence;
+import com.cashigo.expensio.config.RepositoryConfig;
 import com.cashigo.expensio.dto.exception.NoBudgetCycleFoundException;
 import com.cashigo.expensio.dto.exception.NoBudgetDefinitionFoundException;
 import com.cashigo.expensio.model.BudgetDefinition;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -19,6 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
 @DataJpaTest
+@Import(RepositoryConfig.class)
 public class BudgetDefinitionRepositoryTest {
 
     @Autowired

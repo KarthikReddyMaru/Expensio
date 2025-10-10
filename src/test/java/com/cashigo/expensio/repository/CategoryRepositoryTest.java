@@ -1,11 +1,13 @@
 package com.cashigo.expensio.repository;
 
+import com.cashigo.expensio.config.RepositoryConfig;
 import com.cashigo.expensio.dto.exception.NoCategoryFoundException;
 import com.cashigo.expensio.model.Category;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
+@Import(RepositoryConfig.class)
 public class CategoryRepositoryTest {
 
     @Autowired
