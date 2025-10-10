@@ -5,9 +5,12 @@ import com.cashigo.expensio.model.SubCategory;
 import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.CategoryRepository;
 import com.cashigo.expensio.repository.TransactionRepository;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -15,6 +18,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Configuration
+@EnableJpaAuditing
+@EnableScheduling
+@EnableBatchProcessing
 public class BootConfig {
 
     private SubCategory createSubCategory(String name, Category category) {

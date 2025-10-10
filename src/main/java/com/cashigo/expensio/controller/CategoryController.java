@@ -47,7 +47,7 @@ public class CategoryController {
         Response<CategoryDto> response = new Response<>();
         CategoryDto savedCategory = categoryService.updateCategory(categoryDto);
         response.setData(savedCategory);
-        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

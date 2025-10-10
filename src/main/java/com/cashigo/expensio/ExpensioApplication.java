@@ -7,9 +7,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableJpaAuditing
-@EnableScheduling
-@EnableBatchProcessing
 public class ExpensioApplication {
 
     public static void main(String[] args) {
