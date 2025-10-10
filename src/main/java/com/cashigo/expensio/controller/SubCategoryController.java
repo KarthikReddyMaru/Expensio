@@ -37,7 +37,7 @@ public class SubCategoryController {
         Response<SubCategoryDto> response = new Response<>();
         SubCategoryDto savedSubCategory = subCategoryService.saveSubCategory(subCategory);
         response.setData(savedSubCategory);
-        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{subCategoryId}")
