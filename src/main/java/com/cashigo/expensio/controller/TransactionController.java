@@ -48,7 +48,7 @@ public class TransactionController {
         Response<TransactionDto> response = new Response<>();
         TransactionDto savedTransactionDto = transactionService.updateTransaction(transactionDto);
         response.setData(savedTransactionDto);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{transactionId}")
