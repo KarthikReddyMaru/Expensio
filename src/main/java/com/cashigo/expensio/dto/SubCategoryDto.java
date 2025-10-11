@@ -1,6 +1,7 @@
 package com.cashigo.expensio.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -19,5 +20,6 @@ public class SubCategoryDto {
     private boolean system;
     @Positive
     @NotNull(message = "Invalid category Id")
+    @Schema(name = "category-id")
     private Long categoryId;
 }
