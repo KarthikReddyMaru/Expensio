@@ -15,8 +15,8 @@ public class TransactionExceptionHandler {
 
     @ExceptionHandler(NoTransactionFoundException.class)
     public ResponseEntity<ErrorResponse> noTransactionFound(NoTransactionFoundException exception) {
-        ErrorResponse errorResponse = ErrorResponseMapper.fromException(exception, HttpStatus.BAD_REQUEST);
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        ErrorResponse errorResponse = ErrorResponseMapper.fromException(exception, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(AccessDeniedException.class)

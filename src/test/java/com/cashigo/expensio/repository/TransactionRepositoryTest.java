@@ -1,5 +1,6 @@
 package com.cashigo.expensio.repository;
 
+import com.cashigo.expensio.config.RepositoryConfig;
 import com.cashigo.expensio.dto.exception.NoTransactionFoundException;
 import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.model.SubCategory;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -19,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Slf4j
 @DataJpaTest
+@Import(RepositoryConfig.class)
 public class TransactionRepositoryTest {
 
     @Autowired
