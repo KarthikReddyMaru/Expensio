@@ -38,7 +38,6 @@ public class ReportService {
         BigDecimal totalAmountSpent = transactionReport
                 .stream()
                 .map(ReportProjection::getAmountSpent)
-                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         List<CategoryReportDto> categoryReports = getCategoryReports(transactionReport, totalAmountSpent);
@@ -80,10 +79,7 @@ public class ReportService {
         categoryReports
                 .forEach(categoryReport -> {
                     BigDecimal amountSpent = categoryReport.getAmountSpent();
-                    if (amountSpent == null) {
-                        categoryReport.setAmountSpent(BigDecimal.ZERO);
-                        categoryReport.setPercentage(BigDecimal.ZERO);
-                    } else if (amountSpent.compareTo(BigDecimal.ZERO) > 0) {
+                    if (amountSpent.compareTo(BigDecimal.ZERO) > 0) {
                         BigDecimal percentage = amountSpent
                                 .multiply(BigDecimal.valueOf(100))
                                 .divide(totalAmountSpent, 2, RoundingMode.HALF_DOWN);

@@ -50,7 +50,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
         	on sc.id = t.sub_category_id and t.user_id = ?3 and t.transaction_date_time BETWEEN ?1 and ?2
         group by c.id
         UNION all
-        select 'Anonymous', SUM(t2.amount) from transaction t2
+        select 'Anonymous', COALESCE(SUM(t2.amount),0) from transaction t2
         where t2.user_id = ?3 and t2.sub_category_id is null
     """, nativeQuery = true)
     List<ReportProjection> findTransactionReportByInstantRange(Instant start, Instant end, String userId);
