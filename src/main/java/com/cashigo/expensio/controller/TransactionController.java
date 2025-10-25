@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "Transaction")
-@StandardErrorResponses
 @RestController
 @RequestMapping("/transaction")
 @RequiredArgsConstructor
+@StandardErrorResponses
+@Tag(name = "Transaction")
 public class TransactionController {
 
     private final TransactionService transactionService;
