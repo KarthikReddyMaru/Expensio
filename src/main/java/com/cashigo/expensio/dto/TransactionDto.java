@@ -1,9 +1,13 @@
 package com.cashigo.expensio.dto;
 
 import com.cashigo.expensio.common.consts.TransactionRecurrence;
+import com.cashigo.expensio.common.validation.OnCreate;
+import com.cashigo.expensio.common.validation.OnUpdate;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,13 +21,23 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionDto {
+
+    @Null(groups = OnCreate.class, message = "Id not allowed while saving transaction")
+    @NotNull(groups = OnUpdate.class, message = "Transaction Id cannot be null")
     private UUID id;
-    @DecimalMin(value = "0.0", message = "Amount cannot be less than 0")
+
+    @DecimalMin(value = "0.0", message = "Amount cannot be less than 0", groups = {OnCreate.class, OnUpdate.class})
     private BigDecimal amount;
+
+    @Schema(example = "3")
     private Long subCategoryId;
+
     @Schema(example = "2025-10-02T23:59:59Z")
     private LocalDateTime transactionDateTime;
+
     private String note;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Null(groups = OnUpdate.class, message = "Cannot modify recurrence of saved transaction")
     private TransactionRecurrence transactionRecurrenceType;
 }

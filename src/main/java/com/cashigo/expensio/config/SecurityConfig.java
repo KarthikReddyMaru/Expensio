@@ -22,7 +22,9 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(
-                        req -> req.anyRequest().authenticated()
+                        req -> req
+                                .requestMatchers("/v3/**").permitAll()
+                                .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(
                         oauth -> oauth

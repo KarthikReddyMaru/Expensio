@@ -1,12 +1,19 @@
 package com.cashigo.expensio.controller;
 
+import com.cashigo.expensio.common.documentation.StandardErrorResponses;
+import com.cashigo.expensio.common.validation.OnCreate;
+import com.cashigo.expensio.common.validation.OnUpdate;
 import com.cashigo.expensio.dto.BudgetDefinitionDto;
 import com.cashigo.expensio.dto.Response;
 import com.cashigo.expensio.service.BudgetDefinitionService;
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,11 +22,12 @@ import java.util.UUID;
 @RequestMapping("/budgetdefinition")
 @RequiredArgsConstructor
 @RestController
+@StandardErrorResponses
 public class BudgetDefinitionController {
 
     private final BudgetDefinitionService budgetDefinitionService;
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<List<BudgetDefinitionDto>>> getBudgetDefinitionsByUserId() {
         Response<List<BudgetDefinitionDto>> response = new Response<>();
         List<BudgetDefinitionDto> budgetDefinitions = budgetDefinitionService.getBudgetDefinitionsByUserId();
@@ -27,7 +35,7 @@ public class BudgetDefinitionController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{budgetDefinitionId}")
+    @GetMapping(value = "/{budgetDefinitionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<BudgetDefinitionDto>> getBudgetDefinitionById(@PathVariable UUID budgetDefinitionId) {
         Response<BudgetDefinitionDto> response = new Response<>();
         BudgetDefinitionDto budgetDefinition = budgetDefinitionService.getBudgetDefinitionById(budgetDefinitionId);
@@ -35,22 +43,23 @@ public class BudgetDefinitionController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Create budget definition") @ApiResponse(responseCode = "201")
     public ResponseEntity<Response<BudgetDefinitionDto>> saveBudgetDefinition(
-            @Valid @RequestBody BudgetDefinitionDto budgetDefinitionDto) {
+            @Validated(OnCreate.class) @RequestBody BudgetDefinitionDto budgetDefinitionDto) {
         Response<BudgetDefinitionDto> response = new Response<>();
         BudgetDefinitionDto budgetDefinition = budgetDefinitionService.saveBudgetDefinition(budgetDefinitionDto);
         response.setData(budgetDefinition);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<BudgetDefinitionDto>> updateBudgetDefinition(
-            @Valid @RequestBody BudgetDefinitionDto budgetDefinitionDto) {
+            @Validated(OnUpdate.class) @RequestBody BudgetDefinitionDto budgetDefinitionDto) {
         Response<BudgetDefinitionDto> response = new Response<>();
         BudgetDefinitionDto budgetDefinition = budgetDefinitionService.updateBudgetDefinition(budgetDefinitionDto);
         response.setData(budgetDefinition);
-        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{budgetDefinitionId}")

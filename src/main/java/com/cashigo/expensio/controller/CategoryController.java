@@ -1,11 +1,14 @@
 package com.cashigo.expensio.controller;
 
+import com.cashigo.expensio.common.documentation.StandardErrorResponses;
 import com.cashigo.expensio.dto.CategoryDto;
 import com.cashigo.expensio.dto.Response;
 import com.cashigo.expensio.service.CategoryService;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,11 +17,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/category")
 @RequiredArgsConstructor
+@StandardErrorResponses
 public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200")
     public ResponseEntity<Response<List<CategoryDto>>> getAllCategories() {
         List<CategoryDto> categoryDtoList = categoryService.getAllCategoriesByUserId();
         Response<List<CategoryDto>> response = new Response<>();
@@ -26,7 +31,8 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200")
     public ResponseEntity<Response<CategoryDto>> getCategoryById(@PathVariable Long id) {
         CategoryDto categoryDto = categoryService.getCategoryById(id);
         Response<CategoryDto> response = new Response<>();
@@ -34,7 +40,8 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "201")
     public ResponseEntity<Response<CategoryDto>> saveCategory(@Valid @RequestBody CategoryDto categoryDto) {
         Response<CategoryDto> response = new Response<>();
         CategoryDto savedCategory = categoryService.saveCategory(categoryDto);
@@ -42,7 +49,8 @@ public class CategoryController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping
+    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200")
     public ResponseEntity<Response<CategoryDto>> updateCategory(@Valid @RequestBody CategoryDto categoryDto) {
         Response<CategoryDto> response = new Response<>();
         CategoryDto savedCategory = categoryService.updateCategory(categoryDto);
@@ -51,6 +59,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
+    @ApiResponse(responseCode = "204")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategoryById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
