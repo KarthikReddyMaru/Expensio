@@ -1,6 +1,10 @@
 package com.cashigo.expensio.batch.launcher;
 
 import com.cashigo.expensio.common.consts.BudgetRecurrence;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
@@ -19,6 +23,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/batch")
+@Tag(name = "Refresh Transactions/Cycles")
 public class BatchLauncher {
 
     private final JobLauncher jobLauncher;
@@ -38,6 +43,7 @@ public class BatchLauncher {
 
     @GetMapping("/budget/week")
     @SneakyThrows
+    @Operation(summary = "Refresh weekly budgets") @ApiResponse(responseCode = "201")
     public ResponseEntity<Void> refreshWeeklyBudgets() {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addJobParameter("recurrenceType", new JobParameter<>(BudgetRecurrence.WEEKLY.name(), String.class))
@@ -48,6 +54,7 @@ public class BatchLauncher {
 
     @GetMapping("/budget/month")
     @SneakyThrows
+    @Operation(summary = "Refresh monthly budgets") @ApiResponse(responseCode = "201")
     public ResponseEntity<Void> refreshMonthlyBudgets() {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addJobParameter("recurrenceType", new JobParameter<>(BudgetRecurrence.MONTHLY.name(), String.class))
@@ -57,6 +64,11 @@ public class BatchLauncher {
     }
 
     @GetMapping("/transactions/{date}")
+    @Operation(
+            summary = "Create due dated recurrence transactions",
+            parameters = @Parameter(name = "date", example = "2025-10-10")
+    )
+    @ApiResponse(responseCode = "201")
     @SneakyThrows
     public ResponseEntity<Void> processRecurringTransactions(@PathVariable LocalDate date) {
         JobParameters jobParameters = new JobParametersBuilder()
