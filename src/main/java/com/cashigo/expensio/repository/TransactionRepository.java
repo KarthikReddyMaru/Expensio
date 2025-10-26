@@ -1,6 +1,7 @@
 package com.cashigo.expensio.repository;
 
 import com.cashigo.expensio.dto.ReportProjection;
+import com.cashigo.expensio.dto.TransactionExportProjection;
 import com.cashigo.expensio.model.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +55,22 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
         where t2.user_id = ?3 and t2.sub_category_id is null
     """, nativeQuery = true)
     List<ReportProjection> findTransactionReportByInstantRange(Instant start, Instant end, String userId);
+
+    @Query(value = """
+        SELECT
+        c.name as category,
+        sc.name as subCategory,
+        t.amount as amount,
+        t.transaction_date_time as transactionDateTime,
+        t.note as note
+        from category c
+        inner join sub_category sc on c.id = sc.category_id  and (sc.is_system = true or sc.user_id = ?3)
+        right join transaction t on sc.id = t.sub_category_id
+        and t.user_id = ?3
+        where t.transaction_date_time BETWEEN ?1 and ?2
+        order by t.transaction_date_time
+    """, nativeQuery = true)
+    List<TransactionExportProjection> findTransactionsByInstantRange(Instant start, Instant end, String userId);
 
     boolean existsByIdAndUserId(UUID id, String userId);
 

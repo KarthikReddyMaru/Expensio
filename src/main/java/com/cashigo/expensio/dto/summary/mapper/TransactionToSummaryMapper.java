@@ -6,6 +6,8 @@ import com.cashigo.expensio.model.Transaction;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @Component
@@ -17,17 +19,30 @@ public class TransactionToSummaryMapper implements Mapper<Transaction, Transacti
     @Override
     public TransactionSummaryDto map(Transaction entity) {
 
-        TransactionSummaryDto summaryDto = new TransactionSummaryDto();
-        summaryDto.setId(entity.getId());
-        summaryDto.setAmount(entity.getAmount());
-        if(entity.getSubCategory() != null) {
-            summaryDto.setSubCategory(entity.getSubCategory().getName());
-            if(entity.getSubCategory().getCategory() != null)
-                summaryDto.setCategory(entity.getSubCategory().getCategory().getName());
-        }
-        summaryDto.setTransactionDateTime(entity.getTransactionDateTime().atZone(ZoneId.of(zoneId)));
-        summaryDto.setNote(entity.getNote());
-        return summaryDto;
+        return TransactionSummaryDto.builder()
+                .category(getCategory(entity))
+                .subCategory(getSubCategory(entity))
+                .amount(entity.getAmount())
+                .transactionDateTime(toLocalDateTime(entity.getTransactionDateTime()))
+                .note(entity.getNote())
+                .build();
 
     }
+
+    private String getSubCategory(Transaction entity) {
+        if (entity.getSubCategory() != null)
+            return entity.getSubCategory().getName();
+        return null;
+    }
+
+    private String getCategory(Transaction entity) {
+        if (entity.getSubCategory() != null && entity.getSubCategory().getCategory() != null)
+            return entity.getSubCategory().getCategory().getName();
+        return null;
+    }
+
+    private LocalDateTime toLocalDateTime(Instant instant) {
+        return instant.atZone(ZoneId.of(zoneId)).toLocalDateTime();
+    }
+
 }
