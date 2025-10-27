@@ -1,6 +1,7 @@
 package com.cashigo.expensio.service;
 
 import com.cashigo.expensio.common.security.UserContext;
+import com.cashigo.expensio.common.util.CsvUtil;
 import com.cashigo.expensio.dto.TransactionExportProjection;
 import com.cashigo.expensio.dto.mapper.TransactionExportProjectionMapper;
 import com.cashigo.expensio.dto.summary.TransactionSummaryDto;
@@ -49,23 +50,9 @@ public class TransactionExportService {
 
         new StatefulBeanToCsvBuilder<TransactionSummaryDto>(response.getWriter())
                 .withApplyQuotesToAll(false)
-                .withMappingStrategy(getStrategy())
+                .withMappingStrategy(CsvUtil.getStrategy())
                 .build()
                 .write(summary);
-    }
-
-    private HeaderColumnNameMappingStrategy<TransactionSummaryDto> getStrategy() {
-        HeaderColumnNameMappingStrategy<TransactionSummaryDto> strategy =
-                new HeaderColumnNameMappingStrategy<>();
-        strategy.setType(TransactionSummaryDto.class);
-        strategy.setColumnOrderOnWrite(new FixedOrderComparator<>(
-                "DATE",
-                "CATEGORY",
-                "SUBCATEGORY",
-                "AMOUNT",
-                "NOTE"
-        ));
-        return strategy;
     }
 
 }

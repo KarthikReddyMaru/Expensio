@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 @Component
 public class TransactionExportProjectionMapper implements Mapper<TransactionExportProjection, TransactionSummaryDto> {
@@ -31,7 +32,7 @@ public class TransactionExportProjectionMapper implements Mapper<TransactionExpo
 
     public LocalTime toLocalTime(Instant instant) {
         instant = instant.atZone(ZoneId.of("UTC")).toInstant();
-        return instant.atZone(ZoneId.of(zone)).toLocalTime();
+        return instant.atZone(ZoneId.of(zone)).toLocalTime().truncatedTo(ChronoUnit.SECONDS);
     }
 
     public LocalDate toLocalDate(Instant instant) {
