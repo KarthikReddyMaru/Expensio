@@ -2,6 +2,7 @@ package com.cashigo.expensio.dto.mapper;
 
 import com.cashigo.expensio.dto.TransactionExportProjection;
 import com.cashigo.expensio.dto.summary.TransactionSummaryDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
+@Slf4j
 @Component
 public class TransactionExportProjectionMapper implements Mapper<TransactionExportProjection, TransactionSummaryDto> {
 
@@ -31,12 +33,10 @@ public class TransactionExportProjectionMapper implements Mapper<TransactionExpo
     }
 
     public LocalTime toLocalTime(Instant instant) {
-        instant = instant.atZone(ZoneId.of("UTC")).toInstant();
         return instant.atZone(ZoneId.of(zone)).toLocalTime().truncatedTo(ChronoUnit.SECONDS);
     }
 
     public LocalDate toLocalDate(Instant instant) {
-        instant = instant.atZone(ZoneId.of("UTC")).toInstant();
         return instant.atZone(ZoneId.of(zone)).toLocalDate();
     }
 }
