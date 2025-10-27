@@ -11,8 +11,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class CsvUtil {
 
@@ -32,7 +34,7 @@ public class CsvUtil {
     }
 
     public static List<TransactionSummaryDto> parseCSV(MultipartFile multipartFile, List<ImportErrorDto.ErrorMessage> exceptions) {
-        try(Reader reader = new BufferedReader(new InputStreamReader(multipartFile.getInputStream()))) {
+        try (Reader reader = new BufferedReader(new InputStreamReader(multipartFile.getInputStream()))) {
             return new CsvToBeanBuilder<TransactionSummaryDto>(reader)
                     .withIgnoreEmptyLine(true)
                     .withIgnoreLeadingWhiteSpace(true)
@@ -40,8 +42,8 @@ public class CsvUtil {
                     .withErrorLocale(Locale.ENGLISH)
                     .withExceptionHandler(e -> {
                         ImportErrorDto.ErrorMessage message = ImportErrorDto.ErrorMessage.builder()
-                                .rowNumber(e.getLineNumber())
-                                .message(e.getCause().getMessage())
+                                .data(String.join(", ", e.getLine()))
+                                .message(e.getCause() != null ? e.getCause().getMessage() : e.getMessage())
                                 .build();
                         exceptions.add(message);
                         return null;

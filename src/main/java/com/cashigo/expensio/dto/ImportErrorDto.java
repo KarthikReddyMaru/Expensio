@@ -16,7 +16,7 @@ public class ImportErrorDto {
     @Builder
     @Data
     public static class ErrorMessage {
-        private long rowNumber;
+        private String data;
         private String message;
     }
 
