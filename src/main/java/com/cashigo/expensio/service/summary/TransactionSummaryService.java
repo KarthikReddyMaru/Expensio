@@ -24,24 +24,21 @@ public class TransactionSummaryService {
 
     private final TransactionRepository transactionRepository;
     private final TransactionToSummaryMapper transactionToSummaryMapper;
-    private final UserContext userContext;
 
     @Value("${page.size}")
     private int pageSize;
 
     public List<TransactionSummaryDto> getAllTransactionSummaryByUserId(int pageNum) {
-        String userId = userContext.getUserId();
         Sort sort = Sort.by("transactionDateTime").descending();
         Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
-        Page<Transaction> transactions = transactionRepository.findTransactionsOfUserWithSubCategories(userId, pageable);
+        Page<Transaction> transactions = transactionRepository.findTransactionsOfUserWithSubCategories(UserContext.getUserId(), pageable);
         return transactions.stream().map(transactionToSummaryMapper::map).toList();
     }
 
     @SneakyThrows
     public TransactionSummaryDto getTransactionSummaryById(UUID transactionId) {
-        String userId = userContext.getUserId();
         Transaction transaction = transactionRepository
-                .findTransactionByIdWithSubCat(transactionId, userId)
+                .findTransactionByIdWithSubCat(transactionId, UserContext.getUserId())
                 .orElseThrow(NoTransactionFoundException::new);
         return transactionToSummaryMapper.map(transaction);
     }

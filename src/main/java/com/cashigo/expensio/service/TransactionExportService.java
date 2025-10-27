@@ -33,7 +33,6 @@ public class TransactionExportService {
     private String zone;
 
     private final TransactionRepository transactionRepository;
-    private final UserContext userContext;
     private final TransactionExportProjectionMapper mapper;
 
     public void exportTransactionByMonth(int month, int year, HttpServletResponse response)
@@ -41,12 +40,11 @@ public class TransactionExportService {
 
         YearMonth yearMonth = YearMonth.of(year, month);
         ZoneId zoneId = ZoneId.of(zone);
-        String userId = userContext.getUserId();
 
         Instant startTime = yearMonth.atDay(1).atStartOfDay(zoneId).toInstant();
         Instant endTime = yearMonth.atEndOfMonth().atTime(LocalTime.MAX).truncatedTo(ChronoUnit.SECONDS).atZone(zoneId).toInstant();
         List<TransactionExportProjection> transactions = transactionRepository
-                .findTransactionsByInstantRange(startTime, endTime, userId);
+                .findTransactionsByInstantRange(startTime, endTime, UserContext.getUserId());
         List<TransactionSummaryDto> summary = transactions.stream().map(mapper::map).toList();
 
         new StatefulBeanToCsvBuilder<TransactionSummaryDto>(response.getWriter())

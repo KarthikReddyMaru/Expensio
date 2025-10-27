@@ -23,12 +23,10 @@ public class BudgetCycleSummaryService {
     private final BudgetCycleRepository budgetCycleRepository;
     private final BudgetCycleToSummaryMapper budgetCycleToSummaryMapper;
     private final TransactionToSummaryMapper transactionSummaryMapper;
-    private final UserContext userContext;
 
     public BudgetCycleSummaryDto getBudgetCycleSummaryById(UUID budgetCycleId) {
-        String userId = userContext.getUserId();
         BudgetCycle budgetCycle = budgetCycleRepository
-                .findBudgetCycleById(budgetCycleId, userId)
+                .findBudgetCycleById(budgetCycleId, UserContext.getUserId())
                 .orElseThrow(NoBudgetCycleFoundException::new);
         BudgetCycleSummaryDto budgetCycleDto = budgetCycleToSummaryMapper.map(budgetCycle);
         BigDecimal amountSpent = getAmountSpentInCycle(budgetCycleId);
@@ -48,9 +46,8 @@ public class BudgetCycleSummaryService {
     }
 
     public List<TransactionSummaryDto> getTransactionsInCycle(UUID cycleId) {
-        String userId = userContext.getUserId();
         BudgetCycle budgetCycle = budgetCycleRepository
-                .findBudgetCycleWithTransactionsByCycleId(cycleId, userId)
+                .findBudgetCycleWithTransactionsByCycleId(cycleId, UserContext.getUserId())
                 .orElseThrow(NoBudgetCycleFoundException::new);
         return budgetCycle
                 .getTransactions()

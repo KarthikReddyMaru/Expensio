@@ -15,13 +15,11 @@ import java.math.RoundingMode;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class ReportService {
 
-    private final UserContext userContext;
     @Value("${zone.id}")
     private String zone;
 
@@ -54,8 +52,6 @@ public class ReportService {
 
     private List<ReportProjection> getReportProjections(int month, int year) {
 
-        String userId = userContext.getUserId();
-
         YearMonth yearMonth = YearMonth.of(year, month);
 
         LocalDate startDate = yearMonth.atDay(1);
@@ -66,7 +62,7 @@ public class ReportService {
         Instant endInstant = endDate.atTime(LocalTime.MAX).atZone(zoneId).toInstant().truncatedTo(ChronoUnit.SECONDS);
 
         return transactionRepository
-                .findTransactionReportByInstantRange(startInstant, endInstant, userId);
+                .findTransactionReportByInstantRange(startInstant, endInstant, UserContext.getUserId());
     }
 
     private List<CategoryReportDto> getCategoryReports(List<ReportProjection> transactionReport, BigDecimal totalAmountSpent) {

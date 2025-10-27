@@ -34,31 +34,27 @@ public class BudgetDefinitionService {
 
     private final CategoryRepository categoryRepository;
     private final TransactionRepository transactionRepository;
-    private final UserContext userContext;
 
     public BudgetDefinitionDto getBudgetDefinitionById(UUID budgetDefinitionId) {
-        String userId = userContext.getUserId();
         Optional<BudgetDefinition> budgetDefinition = budgetDefinitionRepository
-                .findBudgetDefinitionByIdAndUserId(budgetDefinitionId, userId);
+                .findBudgetDefinitionByIdAndUserId(budgetDefinitionId, UserContext.getUserId());
         BudgetDefinition data = budgetDefinition.orElseThrow(NoBudgetDefinitionFoundException::new);
         return budgetDefinitionMapper.mapToDto(data);
     }
 
     public List<BudgetDefinitionDto> getBudgetDefinitionsByUserId() {
-        String userId = userContext.getUserId();
-        List<BudgetDefinition> budgetDefinitions = budgetDefinitionRepository.findBudgetDefinitionsByUserId(userId);
+        List<BudgetDefinition> budgetDefinitions = budgetDefinitionRepository.findBudgetDefinitionsByUserId(UserContext.getUserId());
         return budgetDefinitions
                 .stream().map(budgetDefinitionMapper::mapToDto).toList();
     }
 
     @SneakyThrows
     public BudgetDefinitionDto saveBudgetDefinition(BudgetDefinitionDto unsavedBudgetDefinition) {
-        String userId = userContext.getUserId();
         BudgetDefinition budgetDefinition = budgetDefinitionMapper.mapToEntity(unsavedBudgetDefinition);
-        budgetDefinition.setUserId(userId);
+        budgetDefinition.setUserId(UserContext.getUserId());
 
         Long categoryId = budgetDefinition.getCategory().getId();
-        boolean categoryExists = categoryRepository.existsCategoryById(categoryId, userId);
+        boolean categoryExists = categoryRepository.existsCategoryById(categoryId, UserContext.getUserId());
         if (!categoryExists)
             throw new NoCategoryFoundException();
 
@@ -74,12 +70,11 @@ public class BudgetDefinitionService {
     }
 
     public BudgetDefinitionDto updateBudgetDefinition(BudgetDefinitionDto budgetDefinitionDto) {
-        String userId = userContext.getUserId();
         UUID budgetDefinitionId = budgetDefinitionDto.getId();
         BudgetDefinition budgetDefinition = budgetDefinitionRepository
-                .findBudgetDefinitionByIdAndUserId(budgetDefinitionId, userId)
+                .findBudgetDefinitionByIdAndUserId(budgetDefinitionId, UserContext.getUserId())
                 .orElseThrow(NoBudgetDefinitionFoundException::new);
-        budgetDefinition.setUserId(userId);
+        budgetDefinition.setUserId(UserContext.getUserId());
         budgetDefinition.setBudgetAmount(budgetDefinitionDto.getBudgetAmount());
         BudgetDefinition saved = budgetDefinitionRepository.save(budgetDefinition);
         return budgetDefinitionMapper.mapToDto(saved);
@@ -87,9 +82,8 @@ public class BudgetDefinitionService {
 
     @Transactional
     public void deleteByBudgetDefinition(UUID budgetDefinitionId) {
-        String userId = userContext.getUserId();
-        budgetDefinitionRepository.deleteBudgetDefinitionByIdAndUserId(budgetDefinitionId, userId);
-        log.info("Budget definition of {} with id {}", userContext.getUserName(), budgetDefinitionId);
+        budgetDefinitionRepository.deleteBudgetDefinitionByIdAndUserId(budgetDefinitionId, UserContext.getUserId());
+        log.info("Budget definition of {} with id {}", UserContext.getUserName(), budgetDefinitionId);
     }
 
 }

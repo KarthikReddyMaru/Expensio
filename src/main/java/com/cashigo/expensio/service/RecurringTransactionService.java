@@ -29,7 +29,6 @@ public class RecurringTransactionService {
     @Value("${zone.id}")
     private String zone;
     private final RecurringTransactionDefinitionRepository transactionDefinitionRepository;
-    private final UserContext userContext;
 
     @Transactional
     public RecurringTransactionDefinition createRecurringTransactionDefinition(Transaction transaction, TransactionRecurrence transactionRecurrence) {
@@ -47,8 +46,7 @@ public class RecurringTransactionService {
 
     @Transactional
     public void deleteRecurringTransactionDefinition(UUID definitionId) {
-        String userId = userContext.getUserId();
-        transactionDefinitionRepository.deleteByIdAndUserId(definitionId, userId);
+        transactionDefinitionRepository.deleteByIdAndUserId(definitionId, UserContext.getUserId());
     }
 
     private RecurringTransactionDefinition mapToTransactionDefinition(Transaction transaction, TransactionRecurrence transactionRecurrence) {

@@ -12,19 +12,19 @@ import java.util.Optional;
 @Component
 public class UserContext {
 
-    public String getUserId() {
+    public static String getUserId() {
         Jwt jwt = getAuthenticationToken();
         return Optional.ofNullable(jwt)
                 .map(JwtClaimAccessor::getSubject).orElse("Anonymous");
     }
 
-    public Optional<String> getUserName() {
+    public static Optional<String> getUserName() {
         Jwt jwt = getAuthenticationToken();
         return Optional.ofNullable(jwt)
                 .map(token -> token.getClaim("preferred_username"));
     }
 
-    public Jwt getAuthenticationToken() {
+    public static Jwt getAuthenticationToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication instanceof JwtAuthenticationToken jwtAuthenticationToken)
             return jwtAuthenticationToken.getToken();

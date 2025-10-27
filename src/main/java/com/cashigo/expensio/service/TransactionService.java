@@ -35,7 +35,6 @@ public class TransactionService {
     private final TransactionMapper transactionMapper;
     private final RecurringTransactionService recurringTransactionService;
     private final BudgetCycleService budgetCycleService;
-    private final UserContext userContext;
 
     @Setter
     @Value("${page.size}")
@@ -43,8 +42,7 @@ public class TransactionService {
 
     @SneakyThrows
     public TransactionDto getTransactionById(UUID transactionId) {
-        String userId = userContext.getUserId();
-        Optional<Transaction> transaction = transactionRepository.findTransactionById(transactionId, userId);
+        Optional<Transaction> transaction = transactionRepository.findTransactionById(transactionId, UserContext.getUserId());
         Transaction data = transaction.orElseThrow(NoTransactionFoundException::new);
         return transactionMapper.mapToDto(data);
     }
@@ -52,8 +50,7 @@ public class TransactionService {
     public List<TransactionDto> getAllTransactionByUserId(int pageNum) {
         Sort sort = Sort.by("transactionDateTime").descending();
         Pageable pageRequest = PageRequest.of(pageNum, pageSize, sort);
-        String userId = userContext.getUserId();
-        Page<Transaction> transactions = transactionRepository.findTransactionsOfUserWithSubCategories(userId, pageRequest);
+        Page<Transaction> transactions = transactionRepository.findTransactionsOfUserWithSubCategories(UserContext.getUserId(), pageRequest);
         return transactions.stream().map(transactionMapper::mapToDto).toList();
     }
 
@@ -61,15 +58,14 @@ public class TransactionService {
     public TransactionDto saveTransaction(TransactionDto unsavedTransaction) {
 
         Transaction transaction = transactionMapper.mapToEntity(unsavedTransaction);
-        String userId = userContext.getUserId();
-        transaction.setUserId(userId);
+        transaction.setUserId(UserContext.getUserId());
 
         TransactionRecurrence transactionRecurrence = unsavedTransaction.getTransactionRecurrenceType();
         if (transactionRecurrence != null && !transactionRecurrence.equals(TransactionRecurrence.NONE))
             setRecurringTransaction(transactionRecurrence, transaction);
 
         if (transaction.getSubCategory() != null)
-            setBudgetCycle(transaction, userId);
+            setBudgetCycle(transaction);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
         return transactionMapper.mapToDto(savedTransaction);
@@ -80,16 +76,15 @@ public class TransactionService {
     public TransactionDto updateTransaction(TransactionDto transactionDto) {
 
         Transaction transaction = transactionMapper.mapToEntity(transactionDto);
-        String userId = userContext.getUserId();
-        transaction.setUserId(userId);
+        transaction.setUserId(UserContext.getUserId());
 
         boolean isTransactionBelongsToUser =
-                transactionRepository.existsByIdAndUserId(transaction.getId(), userId);
+                transactionRepository.existsByIdAndUserId(transaction.getId(), UserContext.getUserId());
         if (!isTransactionBelongsToUser)
             throw new NoTransactionFoundException();
 
         if (transaction.getSubCategory() != null)
-            setBudgetCycle(transaction, userId);
+            setBudgetCycle(transaction);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
         return transactionMapper.mapToDto(savedTransaction);
@@ -97,15 +92,13 @@ public class TransactionService {
 
     @Transactional
     public void deleteTransaction(UUID transactionId) {
-        String userId = userContext.getUserId();
-        log.info("Transaction of {} is deleted with id {}", userContext.getUserName(), transactionId);
-        transactionRepository.deleteByIdAndUserId(transactionId, userId);
+        transactionRepository.deleteByIdAndUserId(transactionId, UserContext.getUserId());
     }
 
-    public void setBudgetCycle(Transaction transaction, String userId) {
+    public void setBudgetCycle(Transaction transaction) {
         Long subCategoryId = transaction.getSubCategory().getId();
         Instant transactionInstant = transaction.getTransactionDateTime();
-        BudgetCycle budgetCycle = budgetCycleService.getBudgetCycleByInstant(subCategoryId, transactionInstant, userId);
+        BudgetCycle budgetCycle = budgetCycleService.getBudgetCycleByInstant(subCategoryId, transactionInstant, com.cashigo.expensio.common.security.UserContext.getUserId());
         transaction.setBudgetCycle(budgetCycle);
     }
 

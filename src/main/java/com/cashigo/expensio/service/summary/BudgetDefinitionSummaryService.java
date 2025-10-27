@@ -18,11 +18,9 @@ public class BudgetDefinitionSummaryService {
 
     private final BudgetDefinitionRepository budgetDefinitionRepository;
     private final BudgetDefinitionToSummaryMapper budgetDefinitionToSummaryMapper;
-    private final UserContext userContext;
 
     public List<BudgetDefinitionSummaryDto> getBudgetDefinitionSummaries() {
-        String userId = userContext.getUserId();
-        List<BudgetDefinition> budgetDefinition = budgetDefinitionRepository.findBudgetDefinitionsWithCycles(userId);
+        List<BudgetDefinition> budgetDefinition = budgetDefinitionRepository.findBudgetDefinitionsWithCycles(UserContext.getUserId());
         return budgetDefinition
                 .stream()
                 .map(budgetDefinitionToSummaryMapper::map)
@@ -30,9 +28,8 @@ public class BudgetDefinitionSummaryService {
     }
 
     public BudgetDefinitionSummaryDto getBudgetDefinitionSummary(UUID budgetDefinitionId) {
-        String userId = userContext.getUserId();
         BudgetDefinition budgetDefinition = budgetDefinitionRepository
-                .findBudgetDefinitionByIdAndUserId(budgetDefinitionId, userId)
+                .findBudgetDefinitionByIdAndUserId(budgetDefinitionId, UserContext.getUserId())
                 .orElseThrow(NoBudgetDefinitionFoundException::new);
         return budgetDefinitionToSummaryMapper.map(budgetDefinition);
     }

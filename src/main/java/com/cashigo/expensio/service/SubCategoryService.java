@@ -33,13 +33,11 @@ public class SubCategoryService {
     private final SubCategoryRepository subCategoryRepository;
     private final CategoryRepository categoryRepository;
     private final SubCategoryMapper subCategoryMapper;
-    private final UserContext userContext;
 
     @SneakyThrows
     public List<SubCategoryDto> getSubCategories(Long categoryId) {
-        String userId = userContext.getUserId();
         Category category = categoryRepository
-                .findCategoryByIdWithSubCategories(categoryId, userId)
+                .findCategoryByIdWithSubCategories(categoryId, UserContext.getUserId())
                 .orElseThrow(NoCategoryFoundException::new);
         List<SubCategory> subCategories = category.getSubCategories();
         return subCategories.stream().map(subCategoryMapper::mapToDto).toList();
@@ -47,17 +45,15 @@ public class SubCategoryService {
 
     @SneakyThrows
     public List<SubCategory> getSubCategoryEntities(Long categoryId) {
-        String userId = userContext.getUserId();
         Category category = categoryRepository
-                .findCategoryByIdWithSubCategories(categoryId, userId)
+                .findCategoryByIdWithSubCategories(categoryId, UserContext.getUserId())
                 .orElseThrow(NoCategoryFoundException::new);
         return category.getSubCategories();
     }
 
     @SneakyThrows
     public SubCategoryDto getSubCategoryById(Long subCategoryId) {
-        String userId = userContext.getUserId();
-        Optional<SubCategory> subCategory = subCategoryRepository.findSubCategoryById(subCategoryId, userId);
+        Optional<SubCategory> subCategory = subCategoryRepository.findSubCategoryById(subCategoryId, UserContext.getUserId());
         SubCategory data = subCategory.orElseThrow(NoSubCategoryFoundException::new);
         return subCategoryMapper.mapToDto(data);
     }
@@ -65,39 +61,36 @@ public class SubCategoryService {
     @Transactional
     @SneakyThrows
     public SubCategoryDto saveSubCategory(SubCategoryDto unsavedSubCategory) {
-
-        String userId = userContext.getUserId();
-        checkCategoryModificationScope(unsavedSubCategory, userId);
-        checkSubCategoryModificationScope(unsavedSubCategory, userId);
+        checkCategoryModificationScope(unsavedSubCategory);
+        checkSubCategoryModificationScope(unsavedSubCategory);
 
         SubCategory subCategory = subCategoryMapper.mapToEntity(unsavedSubCategory);
-        subCategory.setUserId(userId);
+        subCategory.setUserId(UserContext.getUserId());
         SubCategory savedSubCategory = subCategoryRepository.save(subCategory);
         return subCategoryMapper.mapToDto(savedSubCategory);
     }
 
-    private void checkCategoryModificationScope(SubCategoryDto unsavedSubCategory, String userId) throws NoCategoryFoundException {
+    private void checkCategoryModificationScope(SubCategoryDto unsavedSubCategory) throws NoCategoryFoundException {
         Long categoryId = unsavedSubCategory.getCategoryId();
-        boolean categoryExists = categoryRepository.existsCategoryById(categoryId, userId);
+        boolean categoryExists = categoryRepository.existsCategoryById(categoryId, UserContext.getUserId());
         if (!categoryExists)
             throw new NoCategoryFoundException();
     }
 
-    private void checkSubCategoryModificationScope(SubCategoryDto unsavedSubCategory, String userId) throws NoSubCategoryFoundException {
+    private void checkSubCategoryModificationScope(SubCategoryDto unsavedSubCategory) throws NoSubCategoryFoundException {
         Long subCategoryId = unsavedSubCategory.getId();
         if (subCategoryId == null) return;
         if (subCategoryId <= systemSubCategories)
             throw new SystemPropertiesCannotBeModifiedException();
-        if (!subCategoryRepository.existsSubCategoriesById(subCategoryId, userId))
+        if (!subCategoryRepository.existsSubCategoriesById(subCategoryId, UserContext.getUserId()))
             throw new NoSubCategoryFoundException();
     }
 
     @Transactional
     public void deleteSubCategory(Long subCategoryId) {
-        String userId = userContext.getUserId();
         if (subCategoryId <= systemSubCategories)
             throw new SystemPropertiesCannotBeModifiedException();
-        subCategoryRepository.deleteSubCategoryByIdAndUserId(subCategoryId, userId);
+        subCategoryRepository.deleteSubCategoryByIdAndUserId(subCategoryId, UserContext.getUserId());
     }
 
 }

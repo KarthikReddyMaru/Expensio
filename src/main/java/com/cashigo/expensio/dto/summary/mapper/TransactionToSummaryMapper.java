@@ -6,15 +6,13 @@ import com.cashigo.expensio.model.Transaction;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 
 @Component
 public class TransactionToSummaryMapper implements Mapper<Transaction, TransactionSummaryDto> {
 
     @Value("${zone.id}")
-    private String zoneId;
+    private String zone;
 
     @Override
     public TransactionSummaryDto map(Transaction entity) {
@@ -23,7 +21,8 @@ public class TransactionToSummaryMapper implements Mapper<Transaction, Transacti
                 .category(getCategory(entity))
                 .subCategory(getSubCategory(entity))
                 .amount(entity.getAmount())
-                .transactionDateTime(toLocalDateTime(entity.getTransactionDateTime()))
+                .transactionTime(toLocalTime(entity.getTransactionDateTime()))
+                .transactionDate(toLocalDate(entity.getTransactionDateTime()))
                 .note(entity.getNote())
                 .build();
 
@@ -41,8 +40,14 @@ public class TransactionToSummaryMapper implements Mapper<Transaction, Transacti
         return null;
     }
 
-    private LocalDateTime toLocalDateTime(Instant instant) {
-        return instant.atZone(ZoneId.of(zoneId)).toLocalDateTime();
+    public LocalTime toLocalTime(Instant instant) {
+        instant = instant.atZone(ZoneId.of("UTC")).toInstant();
+        return instant.atZone(ZoneId.of(zone)).toLocalTime();
+    }
+
+    public LocalDate toLocalDate(Instant instant) {
+        instant = instant.atZone(ZoneId.of("UTC")).toInstant();
+        return instant.atZone(ZoneId.of(zone)).toLocalDate();
     }
 
 }

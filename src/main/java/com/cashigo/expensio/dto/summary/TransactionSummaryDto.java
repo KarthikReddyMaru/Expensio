@@ -1,21 +1,22 @@
 package com.cashigo.expensio.dto.summary;
 
 import com.opencsv.bean.CsvBindByName;
-import com.opencsv.bean.CsvBindByPosition;
 import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @Builder
 public class TransactionSummaryDto {
 
     @CsvBindByName(column = "Date")
-    private LocalDateTime transactionDateTime;
+    private LocalDate transactionDate;
+
+    @CsvBindByName(column = "Time")
+    private LocalTime transactionTime;
 
     @CsvBindByName(column = "Category")
     private String category;

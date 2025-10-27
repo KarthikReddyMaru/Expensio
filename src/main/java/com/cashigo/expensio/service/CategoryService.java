@@ -26,23 +26,20 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
-    private final UserContext userContext;
 
     @Setter
     @Value("${system.categories}")
     private Long systemCategories;
 
     public List<CategoryDto> getAllCategoriesByUserId() {
-        String userId = userContext.getUserId();
         Sort sort = Sort.by("name").ascending();
-        List<Category> categories = categoryRepository.findCategoriesOfUserWithSubCategories(userId, sort);
+        List<Category> categories = categoryRepository.findCategoriesOfUserWithSubCategories(UserContext.getUserId(), sort);
         return categories.stream().map(categoryMapper::mapToDto).toList();
     }
 
     @SneakyThrows
     public CategoryDto getCategoryById(Long id) {
-        String userId = userContext.getUserId();
-        Optional<Category> category = categoryRepository.findCategoryByIdWithSubCategories(id, userId);
+        Optional<Category> category = categoryRepository.findCategoryByIdWithSubCategories(id, UserContext.getUserId());
         Category data = category.orElseThrow(NoCategoryFoundException::new);
         return categoryMapper.mapToDto(data);
     }
@@ -54,8 +51,7 @@ public class CategoryService {
         if (categoryId != null && categoryId <= systemCategories)
             throw new SystemPropertiesCannotBeModifiedException();
         Category newCategory = categoryMapper.mapToEntity(unsavedCategory);
-        String userId = userContext.getUserId();
-        newCategory.setUserId(userId);
+        newCategory.setUserId(UserContext.getUserId());
         Category savedCategory = categoryRepository.save(newCategory);
         return categoryMapper.mapToDto(savedCategory);
     }
@@ -66,9 +62,8 @@ public class CategoryService {
         Long categoryId = category.getId();
         if (categoryId != null && categoryId <= systemCategories)
             throw new SystemPropertiesCannotBeModifiedException();
-        String userId = userContext.getUserId();
         Category savedCategory = categoryRepository
-                .findCategoryById(categoryId, userId)
+                .findCategoryById(categoryId, UserContext.getUserId())
                 .orElseThrow(NoCategoryFoundException::new);
         savedCategory.setName(category.getName());
         Category updatedCategory = categoryRepository.save(savedCategory);
@@ -79,7 +74,6 @@ public class CategoryService {
     public void deleteCategoryById(Long categoryId) {
         if (categoryId <= systemCategories)
             throw new SystemPropertiesCannotBeModifiedException();
-        String userId = userContext.getUserId();
-        categoryRepository.deleteCategoryByIdAndUserId(categoryId, userId);
+        categoryRepository.deleteCategoryByIdAndUserId(categoryId, UserContext.getUserId());
     }
 }

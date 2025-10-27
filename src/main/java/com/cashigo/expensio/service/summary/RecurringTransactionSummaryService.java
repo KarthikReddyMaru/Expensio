@@ -18,20 +18,17 @@ public class RecurringTransactionSummaryService {
 
     private final RecurringTransactionDefinitionRepository recurringTransactionDefinitionRepository;
     private final RecurringTransactionDefToSummaryMapper summaryMapper;
-    private final UserContext userContext;
 
     public RecurringTranDefSummaryDto getRecurringTransactionById(UUID definitionId) {
-        String userId = userContext.getUserId();
         RecurringTransactionDefinition definition = recurringTransactionDefinitionRepository
-                .findByIdAndUserId(definitionId, userId)
+                .findByIdAndUserId(definitionId, UserContext.getUserId())
                 .orElseThrow(NoRecurringTransactionDefFoundException::new);
         return summaryMapper.map(definition);
     }
 
     public List<UUID> getRecurringTransactionsOfUser() {
-        String userId = userContext.getUserId();
         List<RecurringTransactionDefinition> definitions = recurringTransactionDefinitionRepository
-                .findByUserId(userId);
+                .findByUserId(UserContext.getUserId());
         return definitions.stream().map(RecurringTransactionDefinition::getId).toList();
     }
 
