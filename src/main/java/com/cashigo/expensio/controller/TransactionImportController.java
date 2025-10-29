@@ -23,7 +23,7 @@ public class TransactionImportController {
 
     @PostMapping("/import")
     public void importTransactions(MultipartFile file, HttpServletResponse response) throws CsvRequiredFieldEmptyException, CsvDataTypeMismatchException, IOException {
-        boolean flag = importService.createTransactions(file, response);
+        boolean flag = importService.parseTransactions(file, response);
         if (flag) {
             response.setStatus(HttpStatus.OK.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);

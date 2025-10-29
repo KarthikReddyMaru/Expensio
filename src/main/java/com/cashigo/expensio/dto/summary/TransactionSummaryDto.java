@@ -28,11 +28,11 @@ public class TransactionSummaryDto {
     @CsvDate(value = "HH:mm:ss", writeFormat = "HH:mm:ss")
     private LocalTime transactionTime;
 
-    @CsvBindByName(column = "Category", required = true)
+    @CsvBindByName(column = "Category")
     @NotNull
     private String category;
 
-    @CsvBindByName(column = "SubCategory", required = true)
+    @CsvBindByName(column = "SubCategory")
     @NotNull
     private String subCategory;
 
@@ -42,17 +42,6 @@ public class TransactionSummaryDto {
 
     @CsvBindByName(column = "Note")
     private String note;
-
-    public String toCsv() {
-        return String.join(", ",
-                this.transactionDate.toString(),
-                this.transactionTime.toString(),
-                this.category,
-                this.subCategory,
-                this.amount.toString(),
-                this.note
-        );
-    }
 
     public LocalTime getTransactionTime() {
         return this.transactionTime == null ? LocalTime.of(0, 0, 0) : this.transactionTime;

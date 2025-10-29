@@ -1,5 +1,6 @@
 package com.cashigo.expensio.common.util;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -10,11 +11,12 @@ import java.time.temporal.TemporalAdjusters;
 @Component
 public class ZoneUtil {
 
-    @Value("${zone.id}")
-    private static String zoneId;
+    @Getter
+    private static ZoneId zoneId;
 
-    public static ZoneId getZoneId() {
-        return ZoneId.of(zoneId);
+    @Value("${zone.id:Asia/Kolkata}")
+    private void setZoneId(String zoneId) {
+        ZoneUtil.zoneId = ZoneId.of(zoneId);
     }
 
     public static LocalTime toLocalTime(Instant instant) {
@@ -27,6 +29,11 @@ public class ZoneUtil {
 
     public static Instant toInstant(LocalDateTime localDateTime) {
         return localDateTime.atZone(getZoneId()).toInstant();
+    }
+
+    public static Instant toInstant(LocalDate localDate, LocalTime localTime) {
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
+        return localDateTime.atZone(getZoneId()).toInstant().truncatedTo(ChronoUnit.SECONDS);
     }
 
     public static Instant getStartOfMonthInstant(Instant instant) {
