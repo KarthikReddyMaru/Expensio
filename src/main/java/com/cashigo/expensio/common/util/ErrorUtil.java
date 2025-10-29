@@ -12,7 +12,7 @@ public class ErrorUtil {
                 .getFieldErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.joining("; "));
+                .collect(Collectors.joining(" | "));
     }
 
 }

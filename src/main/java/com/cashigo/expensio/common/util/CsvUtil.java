@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class CsvUtil {
@@ -67,8 +69,12 @@ public class CsvUtil {
 
             List<TransactionSummaryDto> transactions = csvToBean.parse();
 
-            for (CsvException exception : csvToBean.getCapturedExceptions()) {
-                ImportErrorDto error = parseError(exception);
+            Map<Long, List<CsvException>> csvExceptions = csvToBean.getCapturedExceptions()
+                    .stream()
+                    .collect(Collectors.groupingBy(CsvException::getLineNumber));
+
+            for (Map.Entry<Long, List<CsvException>> exception : csvExceptions.entrySet()) {
+                ImportErrorDto error = parseError(exception.getValue().getFirst().getLine(), exception.getValue());
                 exceptions.add(error);
             }
             return transactions;
@@ -92,13 +98,13 @@ public class CsvUtil {
 
     }
 
-    private static ImportErrorDto parseError(CsvException exception) {
+    private static ImportErrorDto parseError(String[] record, List<CsvException> exceptions) {
 
-        String reason = exception.getCause() != null ?
-                exception.getCause().getMessage() : exception.getMessage();
+        String reason = exceptions.stream()
+                .map(e -> e.getCause() != null ? e.getCause().getMessage() : e.getMessage())
+                .collect(Collectors.joining(" | "));
 
         String[] headers = headerCache.get();
-        String[] record = exception.getLine();
 
         ImportErrorDto.ImportErrorDtoBuilder builder = ImportErrorDto.builder();
 

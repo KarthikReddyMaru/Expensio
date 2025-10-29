@@ -10,7 +10,6 @@ import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Validator;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,10 +26,10 @@ public class TransactionImportService {
 
     private final Validator validator;
 
-    public void createTransactions(MultipartFile multipartFile, HttpServletResponse response) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
+    public boolean createTransactions(MultipartFile multipartFile, HttpServletResponse response) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
 
-        if (multipartFile.isEmpty())
-            return;
+        if (multipartFile == null || multipartFile.isEmpty())
+            return false;
 
         List<ImportErrorDto> errorMessages = new ArrayList<>();
         List<TransactionSummaryDto> transactions = CsvUtil.parseCSV(multipartFile, errorMessages);
@@ -53,9 +52,11 @@ public class TransactionImportService {
                     .withApplyQuotesToAll(false)
                     .build()
                     .write(errorMessages);
+            return false;
         }
 
         transactions.forEach(transaction -> log.info("{}", transaction));
+        return true;
     }
 
     private ImportErrorDto buildImportError(String reason, TransactionSummaryDto transaction) {
