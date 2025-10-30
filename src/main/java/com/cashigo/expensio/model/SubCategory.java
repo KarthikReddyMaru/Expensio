@@ -30,7 +30,7 @@ public class SubCategory {
 
     private boolean isSystem;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
