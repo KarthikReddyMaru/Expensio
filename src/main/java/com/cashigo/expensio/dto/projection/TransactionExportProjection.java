@@ -1,4 +1,4 @@
-package com.cashigo.expensio.dto;
+package com.cashigo.expensio.dto.projection;
 
 import java.math.BigDecimal;
 import java.time.Instant;

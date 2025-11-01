@@ -1,6 +1,6 @@
 package com.cashigo.expensio.dto.mapper;
 
-import com.cashigo.expensio.dto.TransactionExportProjection;
+import com.cashigo.expensio.dto.projection.TransactionExportProjection;
 import com.cashigo.expensio.dto.summary.TransactionSummaryDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

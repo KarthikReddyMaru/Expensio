@@ -3,7 +3,7 @@ package com.cashigo.expensio.service;
 import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.CategoryReportDto;
 import com.cashigo.expensio.dto.ReportDto;
-import com.cashigo.expensio.dto.ReportProjection;
+import com.cashigo.expensio.dto.projection.ReportProjection;
 import com.cashigo.expensio.dto.mapper.ReportProjectionToCategoryMapper;
 import com.cashigo.expensio.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;

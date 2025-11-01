@@ -1,14 +1,16 @@
 package com.cashigo.expensio.service;
 
 import com.cashigo.expensio.common.security.UserContext;
-import com.cashigo.expensio.common.util.CategoryUtil;
-import com.cashigo.expensio.common.util.CsvUtil;
-import com.cashigo.expensio.common.util.ErrorUtil;
-import com.cashigo.expensio.common.util.ZoneUtil;
+import com.cashigo.expensio.common.util.*;
 import com.cashigo.expensio.dto.ImportErrorDto;
+import com.cashigo.expensio.dto.projection.BudgetDefCacheProjection;
 import com.cashigo.expensio.dto.summary.TransactionSummaryDto;
+import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.Category;
+import com.cashigo.expensio.model.SubCategory;
 import com.cashigo.expensio.model.Transaction;
+import com.cashigo.expensio.repository.BudgetCycleRepository;
+import com.cashigo.expensio.repository.BudgetDefinitionRepository;
 import com.cashigo.expensio.repository.CategoryRepository;
 import com.cashigo.expensio.repository.TransactionRepository;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
@@ -25,6 +27,7 @@ import org.springframework.validation.Validator;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,6 +41,8 @@ public class TransactionImportService {
     private final CategoryRepository categoryRepository;
     private final TransactionRepository transactionRepository;
     private final CategoryImportService categoryImportService;
+    private final BudgetDefinitionRepository budgetDefinitionRepository;
+    private final BudgetCycleRepository budgetCycleRepository;
 
     @Transactional
     public boolean parseTransactions(MultipartFile multipartFile, HttpServletResponse response) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
@@ -86,13 +91,17 @@ public class TransactionImportService {
 
         List<Category> categories = categoryRepository
                 .findCategoriesOfUserWithSubCategories(UserContext.getUserId(), Sort.by("name"));
+        List<BudgetDefCacheProjection> defCacheProjections = budgetDefinitionRepository
+                .findBudgetDefinitionsForCacheByUserId(UserContext.getUserId());
 
         CategoryUtil.createCategoryCache(categories);
+        BudgetCycleUtil.createCache(defCacheProjections);
         List<Transaction> transactions = records
                 .stream()
-                .map(TransactionImportService::mapTransaction)
+                .map(this::mapTransaction)
                 .toList();
         transactionRepository.saveAll(transactions);
+        BudgetCycleUtil.clearCache();
         CategoryUtil.clearCache();
     }
 
@@ -126,14 +135,28 @@ public class TransactionImportService {
                 .build();
     }
 
-    private static Transaction mapTransaction(TransactionSummaryDto dto) {
+    private Transaction mapTransaction(TransactionSummaryDto dto) {
+
+        Instant transactionTime = ZoneUtil.toInstant(dto.getTransactionDate(), dto.getTransactionTime());
+        Category category = CategoryUtil.getCategory(dto.getCategory());
+        SubCategory subCategory = CategoryUtil.getSubCategory(dto.getCategory(), dto.getSubCategory());
+
         Transaction transaction = new Transaction();
         transaction.setAmount(dto.getAmount());
         transaction.setUserId(UserContext.getUserId());
-        transaction.setTransactionDateTime(ZoneUtil.toInstant(dto.getTransactionDate(), dto.getTransactionTime()));
+        transaction.setTransactionDateTime(transactionTime);
         transaction.setNote(dto.getNote());
-        transaction.setSubCategory(CategoryUtil.getSubCategory(dto.getCategory(), dto.getSubCategory()));
+        transaction.setSubCategory(subCategory);
+        assert category != null;
+        transaction.setBudgetCycle(getBudgetCycle(category.getId(), transactionTime));
         return transaction;
+    }
+
+    private BudgetCycle getBudgetCycle(Long categoryId, Instant transactionTime) {
+        UUID budgetCycleByCategory = BudgetCycleUtil.getBudgetCycleByCategory(categoryId, transactionTime);
+        if (budgetCycleByCategory != null)
+            return budgetCycleRepository.getReferenceById(budgetCycleByCategory);
+        return null;
     }
 
 }

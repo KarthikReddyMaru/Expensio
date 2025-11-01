@@ -1,7 +1,7 @@
 package com.cashigo.expensio.dto.mapper;
 
 import com.cashigo.expensio.dto.CategoryReportDto;
-import com.cashigo.expensio.dto.ReportProjection;
+import com.cashigo.expensio.dto.projection.ReportProjection;
 import org.springframework.stereotype.Component;
 
 @Component

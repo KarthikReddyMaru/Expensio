@@ -1,7 +1,7 @@
 package com.cashigo.expensio.repository;
 
-import com.cashigo.expensio.dto.ReportProjection;
-import com.cashigo.expensio.dto.TransactionExportProjection;
+import com.cashigo.expensio.dto.projection.ReportProjection;
+import com.cashigo.expensio.dto.projection.TransactionExportProjection;
 import com.cashigo.expensio.model.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

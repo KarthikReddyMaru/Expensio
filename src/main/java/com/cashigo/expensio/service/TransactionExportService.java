@@ -2,18 +2,16 @@ package com.cashigo.expensio.service;
 
 import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.common.util.CsvUtil;
-import com.cashigo.expensio.dto.TransactionExportProjection;
+import com.cashigo.expensio.dto.projection.TransactionExportProjection;
 import com.cashigo.expensio.dto.mapper.TransactionExportProjectionMapper;
 import com.cashigo.expensio.dto.summary.TransactionSummaryDto;
 import com.cashigo.expensio.repository.TransactionRepository;
-import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.comparators.FixedOrderComparator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

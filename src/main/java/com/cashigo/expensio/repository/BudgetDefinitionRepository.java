@@ -1,6 +1,7 @@
 package com.cashigo.expensio.repository;
 
 import com.cashigo.expensio.common.consts.BudgetRecurrence;
+import com.cashigo.expensio.dto.projection.BudgetDefCacheProjection;
 import com.cashigo.expensio.model.BudgetDefinition;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -25,6 +26,16 @@ public interface BudgetDefinitionRepository extends JpaRepository<BudgetDefiniti
         where bd.userId = :userId and bd.category.id = :categoryId and :instant between bc.cycleStartDateTime and bc.cycleEndDateTime
     """)
     Optional<BudgetDefinition> findBudgetDefinitionByCategoryAndDateRangeWithCycles(Long categoryId, Instant instant, String userId);
+
+    @Query(value = """
+        select bd.category_id categoryId,
+               bc.id budgetCycleId,
+               bc.cycle_start_date_time start,
+               bc.cycle_end_date_time end
+               from budget_definition bd join budget_cycle bc on bc.budget_definition_id = bd.id
+               where bd.user_id = :userId
+    """, nativeQuery = true)
+    List<BudgetDefCacheProjection> findBudgetDefinitionsForCacheByUserId(String userId);
 
     List<BudgetDefinition> findBudgetDefinitionsByUserId(String userId);
 
