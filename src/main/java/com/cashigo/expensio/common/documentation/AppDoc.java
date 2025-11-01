@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
         info = @Info(
                 title = "Cashigo",
                 description = "A money managing app",
-                version = "1.1.1",
+                version = "1.1.0",
                 contact = @Contact(
                         name = "Beast Boy",
                         email = "karthikreddy.maru@gmail.com"
@@ -24,11 +24,11 @@ import java.lang.annotation.Target;
         ),
         servers = {
                 @Server(
-                        url = "https://localhost:9000/expensio",
+                        url = "http://localhost:9000/expensio",
                         description = "Local Expensio"
                 ),
                 @Server(
-                        url = "https://localhost:9000",
+                        url = "http://localhost:9000",
                         description = "Local Gateway"
                 )
         },
@@ -39,8 +39,8 @@ import java.lang.annotation.Target;
         type = SecuritySchemeType.OAUTH2,
         flows = @OAuthFlows(
                 authorizationCode = @OAuthFlow (
-                        authorizationUrl = "https://localhost:8000/realms/Cashigo/protocol/openid-connect/auth",
-                        tokenUrl = "https://localhost:8000/realms/Cashigo/protocol/openid-connect/token",
+                        authorizationUrl = "http://localhost:8000/realms/Cashigo/protocol/openid-connect/auth",
+                        tokenUrl = "http://localhost:8000/realms/Cashigo/protocol/openid-connect/token",
                         scopes = {
                                 @OAuthScope(name = "openid"), @OAuthScope(name = "email"), @OAuthScope(name = "profile")
                         }

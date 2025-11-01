@@ -1,8 +1,10 @@
 package com.cashigo.expensio.controller.summary;
 
+import com.cashigo.expensio.common.documentation.StandardErrorResponses;
 import com.cashigo.expensio.dto.summary.RecurringTranDefSummaryDto;
 import com.cashigo.expensio.dto.Response;
 import com.cashigo.expensio.service.summary.RecurringTransactionSummaryService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/summary/recurringtransaction")
 @RequiredArgsConstructor
+@StandardErrorResponses
+@Tag(name = "Recurring Transactions - Summary")
 public class RecurringTranDefSummaryController {
 
     private final RecurringTransactionSummaryService summaryService;

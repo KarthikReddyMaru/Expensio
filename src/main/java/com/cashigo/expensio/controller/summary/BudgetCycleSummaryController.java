@@ -1,10 +1,12 @@
 package com.cashigo.expensio.controller.summary;
 
+import com.cashigo.expensio.common.documentation.StandardErrorResponses;
 import com.cashigo.expensio.dto.Response;
 import com.cashigo.expensio.dto.summary.BudgetCycleSummaryDto;
 import com.cashigo.expensio.dto.summary.TransactionSummaryDto;
 import com.cashigo.expensio.service.summary.BudgetCycleSummaryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("summary/budgetcycle")
 @RequiredArgsConstructor
+@StandardErrorResponses
+@Tag(name = "Budget Cycle - Summary")
 public class BudgetCycleSummaryController {
 
     private final BudgetCycleSummaryService budgetCycleSummaryService;
