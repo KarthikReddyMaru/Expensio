@@ -202,10 +202,8 @@ public class SubCategoryRepositoryTest {
     }
 
     SubCategory createSubCategoryUnderSystemCategory() {
-        Category category = new Category();
-        category.setId(new Random().nextLong(systemCategoryIds) + 1);
         SubCategory subCategory = new SubCategory();
-        subCategory.setCategory(category);
+        subCategory.setCategory(categoryRepository.getReferenceById(new Random().nextLong(systemCategoryIds) + 1));
         subCategory.setName("SubCategoryUnderSystemCategory");
         subCategory.setUserId(userId);
         return subCategory;

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -37,8 +38,6 @@ public class TransactionServiceTest {
     @Mock
     private TransactionRepository transactionRepository;
     @Mock
-    private UserContext userContext;
-    @Mock
     private TransactionMapper transactionMapper;
     @Mock
     private BudgetCycleService budgetCycleService;
@@ -48,13 +47,13 @@ public class TransactionServiceTest {
     @InjectMocks
     private TransactionService transactionService;
 
-    private String currentLoggedInUserId;
-
     @BeforeEach
     public void init() {
-        currentLoggedInUserId = UUID.randomUUID().toString();
+        String currentLoggedInUserId = UUID.randomUUID().toString();
         transactionService.setPageSize(10);
-        when(userContext.getUserId()).thenReturn(currentLoggedInUserId);
+        try(MockedStatic<UserContext> userContext = mockStatic(UserContext.class)) {
+            userContext.when(UserContext::getUserId).thenReturn(currentLoggedInUserId);
+        }
     }
 
     @Test
@@ -62,14 +61,14 @@ public class TransactionServiceTest {
         UUID transactionId = UUID.randomUUID();
         TransactionDto expectedDto = new TransactionDto();
 
-        when(transactionRepository.findTransactionById(transactionId, currentLoggedInUserId))
+        when(transactionRepository.findTransactionById(transactionId, UserContext.getUserId()))
                 .thenReturn(Optional.of(new Transaction()));
         when(transactionMapper.mapToDto(any(Transaction.class))).thenReturn(expectedDto);
 
         TransactionDto actualDto = transactionService.getTransactionById(transactionId);
 
         verify(transactionRepository)
-                .findTransactionById(transactionId, currentLoggedInUserId);
+                .findTransactionById(transactionId, UserContext.getUserId());
         verify(transactionMapper).mapToDto(any(Transaction.class));
         assertThat(actualDto).as("Dto").isEqualTo(expectedDto);
     }
@@ -78,13 +77,13 @@ public class TransactionServiceTest {
     public void whenFetchingOtherUserTransactionById_thenExceptionIsThrown() {
         UUID transactionId = UUID.randomUUID();
 
-        when(transactionRepository.findTransactionById(transactionId, currentLoggedInUserId))
+        when(transactionRepository.findTransactionById(transactionId, UserContext.getUserId()))
                 .thenReturn(Optional.empty());
 
         assertThatThrownBy(() ->
                 transactionService.getTransactionById(transactionId)
         ).isInstanceOf(NoTransactionFoundException.class);
-        verify(transactionRepository).findTransactionById(transactionId, currentLoggedInUserId);
+        verify(transactionRepository).findTransactionById(transactionId, UserContext.getUserId());
         verify(transactionMapper, never()).mapToDto(any(Transaction.class));
     }
 
@@ -94,13 +93,13 @@ public class TransactionServiceTest {
         List<Transaction> transactions = Stream.generate(Transaction::new).limit(10).toList();
         Page<Transaction> transactionPage = new PageImpl<>(transactions);
 
-        when(transactionRepository.findTransactionsOfUserWithSubCategories(eq(currentLoggedInUserId), any(Pageable.class)))
+        when(transactionRepository.findTransactionsOfUserWithSubCategories(eq(UserContext.getUserId()), any(Pageable.class)))
                 .thenReturn(transactionPage);
         when(transactionMapper.mapToDto(any(Transaction.class))).thenReturn(new TransactionDto());
 
         List<TransactionDto> transactionDto = transactionService.getAllTransactionByUserId(1);
 
-        verify(transactionRepository).findTransactionsOfUserWithSubCategories(eq(currentLoggedInUserId), any(Pageable.class));
+        verify(transactionRepository).findTransactionsOfUserWithSubCategories(eq(UserContext.getUserId()), any(Pageable.class));
         verify(transactionMapper, times(10)).mapToDto(any(Transaction.class));
         assertThat(transactionDto).isNotNull().hasSize(10);
     }
@@ -124,7 +123,7 @@ public class TransactionServiceTest {
         inOrder.verify(transactionRepository).save(transaction);
         inOrder.verify(transactionMapper).mapToDto(savedTransaction);
 
-        verify(budgetCycleService, never()).getBudgetCycleByInstant(anyLong(), any(Instant.class), eq(currentLoggedInUserId));
+        verify(budgetCycleService, never()).getBudgetCycleByInstant(anyLong(), any(Instant.class), eq(UserContext.getUserId()));
         verify(recurringTransactionService, never()).createRecurringTransactionDefinition(any(Transaction.class), any(TransactionRecurrence.class));
         assertThat(actualResultDto).isEqualTo(savedTransactionDto);
     }
@@ -143,7 +142,7 @@ public class TransactionServiceTest {
         TransactionDto savedTransactionDto = new TransactionDto();
 
         when(transactionMapper.mapToEntity(transactionDto)).thenReturn(transaction);
-        when(budgetCycleService.getBudgetCycleByInstant(subCategoryId, transactionDateTime, currentLoggedInUserId))
+        when(budgetCycleService.getBudgetCycleByInstant(subCategoryId, transactionDateTime, UserContext.getUserId()))
                 .thenReturn(budgetCycle);
         when(transactionRepository.save(transaction)).thenReturn(savedTransaction);
         when(transactionMapper.mapToDto(savedTransaction)).thenReturn(savedTransactionDto);
@@ -152,7 +151,7 @@ public class TransactionServiceTest {
 
         InOrder inOrder = inOrder(transactionMapper, transactionRepository, budgetCycleService);
         inOrder.verify(transactionMapper).mapToEntity(transactionDto);
-        inOrder.verify(budgetCycleService).getBudgetCycleByInstant(subCategoryId, transactionDateTime, currentLoggedInUserId);
+        inOrder.verify(budgetCycleService).getBudgetCycleByInstant(subCategoryId, transactionDateTime, UserContext.getUserId());
         inOrder.verify(transactionRepository).save(transaction);
         inOrder.verify(transactionMapper).mapToDto(savedTransaction);
 
@@ -183,7 +182,7 @@ public class TransactionServiceTest {
         inOrder.verify(recurringTransactionService).createRecurringTransactionDefinition(unsavedTransaction, recurrence);
         inOrder.verify(transactionRepository).save(unsavedTransaction);
 
-        verify(budgetCycleService, never()).getBudgetCycleByInstant(anyLong(), any(Instant.class), eq(currentLoggedInUserId));
+        verify(budgetCycleService, never()).getBudgetCycleByInstant(anyLong(), any(Instant.class), eq(UserContext.getUserId()));
         assertThat(actualDto).isEqualTo(savedTransactionDto);
     }
 
@@ -205,7 +204,7 @@ public class TransactionServiceTest {
 
         when(transactionMapper.mapToEntity(transactionDto)).thenReturn(unsavedTransaction);
         when(transactionMapper.mapToDto(savedTransaction)).thenReturn(savedTransactionDto);
-        when(budgetCycleService.getBudgetCycleByInstant(subCategoryId, transactionDateTime, currentLoggedInUserId))
+        when(budgetCycleService.getBudgetCycleByInstant(subCategoryId, transactionDateTime, UserContext.getUserId()))
                 .thenReturn(budgetCycle);
         when(recurringTransactionService.createRecurringTransactionDefinition(unsavedTransaction, recurrence))
                 .thenReturn(recurringTransactionDefinition);
@@ -215,7 +214,7 @@ public class TransactionServiceTest {
 
         InOrder inOrder = inOrder(transactionRepository, recurringTransactionService, budgetCycleService);
         inOrder.verify(recurringTransactionService).createRecurringTransactionDefinition(unsavedTransaction, recurrence);
-        inOrder.verify(budgetCycleService).getBudgetCycleByInstant(subCategoryId, transactionDateTime, currentLoggedInUserId);
+        inOrder.verify(budgetCycleService).getBudgetCycleByInstant(subCategoryId, transactionDateTime, UserContext.getUserId());
         inOrder.verify(transactionRepository).save(unsavedTransaction);
 
         assertThat(actualDto).isEqualTo(savedTransactionDto);
@@ -235,7 +234,7 @@ public class TransactionServiceTest {
         TransactionDto savedTransactionDto = new TransactionDto();
 
         when(transactionMapper.mapToEntity(transactionDto)).thenReturn(transaction);
-        when(budgetCycleService.getBudgetCycleByInstant(subCategoryId, transactionDateTime, currentLoggedInUserId))
+        when(budgetCycleService.getBudgetCycleByInstant(subCategoryId, transactionDateTime, UserContext.getUserId()))
                 .thenReturn(budgetCycle);
         when(transactionRepository.save(transaction)).thenReturn(savedTransaction);
         when(transactionMapper.mapToDto(savedTransaction)).thenReturn(savedTransactionDto);
@@ -244,7 +243,7 @@ public class TransactionServiceTest {
 
         InOrder inOrder = inOrder(transactionMapper, transactionRepository, budgetCycleService);
         inOrder.verify(transactionMapper).mapToEntity(transactionDto);
-        inOrder.verify(budgetCycleService).getBudgetCycleByInstant(subCategoryId, transactionDateTime, currentLoggedInUserId);
+        inOrder.verify(budgetCycleService).getBudgetCycleByInstant(subCategoryId, transactionDateTime, UserContext.getUserId());
         inOrder.verify(transactionRepository).save(transaction);
         inOrder.verify(transactionMapper).mapToDto(savedTransaction);
 
@@ -262,7 +261,7 @@ public class TransactionServiceTest {
         unsavedTransaction.setId(transactionId);
 
         when(transactionMapper.mapToEntity(transactionDto)).thenReturn(unsavedTransaction);
-        when(transactionRepository.existsByIdAndUserId(any(UUID.class), eq(currentLoggedInUserId)))
+        when(transactionRepository.existsByIdAndUserId(any(UUID.class), eq(UserContext.getUserId())))
                 .thenReturn(false);
 
         assertThatThrownBy(() ->

@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -34,10 +35,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class BudgetDefinitionServiceTest {
 
-    private String currentLoggedInUserId;
-
-    @Mock
-    private UserContext userContext;
     @Mock
     private BudgetDefinitionRepository budgetDefinitionRepository;
     @Mock
@@ -56,9 +53,12 @@ public class BudgetDefinitionServiceTest {
 
     @BeforeEach
     public void init() {
-        currentLoggedInUserId = UUID.randomUUID().toString();
-        when(userContext.getUserId()).thenReturn(currentLoggedInUserId);
+        String currentLoggedInUserId = UUID.randomUUID().toString();
+        try(MockedStatic<UserContext> mockedStatic = mockStatic(UserContext.class)) {
+            mockedStatic.when(UserContext::getUserId).thenReturn(currentLoggedInUserId);
+        }
     }
+
 
     @Test
     void whenSavingBudgetDefinition_thenItIsPersisted() {
@@ -71,7 +71,7 @@ public class BudgetDefinitionServiceTest {
         BudgetCycle budgetCycle = new BudgetCycle();
 
         when(budgetDefinitionMapper.mapToEntity(budgetDefinitionDto)).thenReturn(unsavedBudgetDefinition);
-        when(categoryRepository.existsCategoryById(categoryId, currentLoggedInUserId)).thenReturn(true);
+        when(categoryRepository.existsCategoryById(categoryId, UserContext.getUserId())).thenReturn(true);
         when(budgetCycleService.createBudgetCycle(unsavedBudgetDefinition)).thenReturn(budgetCycle);
         when(budgetDefinitionRepository.save(unsavedBudgetDefinition)).thenReturn(savedBudgetDefinition);
         when(budgetTrackingService.getTransactionsOfCurrentBudgetCycle(budgetCycle)).thenReturn(transactions);
@@ -81,7 +81,7 @@ public class BudgetDefinitionServiceTest {
 
         InOrder inOrder = inOrder(categoryRepository, budgetCycleService,
                 budgetDefinitionRepository, budgetTrackingService, transactionRepository);
-        inOrder.verify(categoryRepository).existsCategoryById(categoryId, currentLoggedInUserId);
+        inOrder.verify(categoryRepository).existsCategoryById(categoryId, UserContext.getUserId());
         inOrder.verify(budgetCycleService).createBudgetCycle(unsavedBudgetDefinition);
         inOrder.verify(budgetDefinitionRepository).save(unsavedBudgetDefinition);
         inOrder.verify(budgetTrackingService).getTransactionsOfCurrentBudgetCycle(budgetCycle);
@@ -97,7 +97,7 @@ public class BudgetDefinitionServiceTest {
         BudgetDefinition unsavedBudgetDefinition = createBudgetDefinition(categoryId);
 
         when(budgetDefinitionMapper.mapToEntity(budgetDefinitionDto)).thenReturn(unsavedBudgetDefinition);
-        when(categoryRepository.existsCategoryById(categoryId, currentLoggedInUserId)).thenReturn(false);
+        when(categoryRepository.existsCategoryById(categoryId, UserContext.getUserId())).thenReturn(false);
 
         assertThatThrownBy(() ->
                 budgetDefinitionService.saveBudgetDefinition(budgetDefinitionDto)
@@ -105,7 +105,7 @@ public class BudgetDefinitionServiceTest {
 
         InOrder inOrder = inOrder(categoryRepository, budgetCycleService,
                 budgetDefinitionRepository, budgetTrackingService, transactionRepository);
-        inOrder.verify(categoryRepository).existsCategoryById(categoryId, currentLoggedInUserId);
+        inOrder.verify(categoryRepository).existsCategoryById(categoryId, UserContext.getUserId());
         inOrder.verify(budgetCycleService, never()).createBudgetCycle(unsavedBudgetDefinition);
         inOrder.verify(budgetDefinitionRepository, never()).save(unsavedBudgetDefinition);
         inOrder.verify(budgetTrackingService, never()).getTransactionsOfCurrentBudgetCycle(any(BudgetCycle.class));
@@ -124,7 +124,7 @@ public class BudgetDefinitionServiceTest {
         BudgetDefinition savedBudgetDefinition = new BudgetDefinition();
         BudgetDefinitionDto savedBudgetDefinitionDto = new BudgetDefinitionDto();
 
-        when(budgetDefinitionRepository.findBudgetDefinitionByIdAndUserId(budgetDefinitionId, currentLoggedInUserId))
+        when(budgetDefinitionRepository.findBudgetDefinitionByIdAndUserId(budgetDefinitionId, UserContext.getUserId()))
                 .thenReturn(Optional.of(fetchedBudgetDefinition));
         when(budgetDefinitionRepository.save(fetchedBudgetDefinition)).thenReturn(savedBudgetDefinition);
         when(budgetDefinitionMapper.mapToDto(savedBudgetDefinition)).thenReturn(savedBudgetDefinitionDto);
@@ -134,7 +134,7 @@ public class BudgetDefinitionServiceTest {
         verify(budgetDefinitionRepository).save(
                 argThat(definition ->
                         definition.getBudgetAmount().equals(updatedAmount) &&
-                        definition.getUserId().equals(currentLoggedInUserId)
+                        definition.getUserId().equals(UserContext.getUserId())
                 )
         );
         verify(budgetDefinitionMapper).mapToDto(savedBudgetDefinition);
@@ -149,7 +149,7 @@ public class BudgetDefinitionServiceTest {
         budgetDefinitionDto.setBudgetAmount(updatedAmount);
         budgetDefinitionDto.setId(budgetDefinitionId);
 
-        when(budgetDefinitionRepository.findBudgetDefinitionByIdAndUserId(budgetDefinitionId, currentLoggedInUserId))
+        when(budgetDefinitionRepository.findBudgetDefinitionByIdAndUserId(budgetDefinitionId, UserContext.getUserId()))
                 .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> budgetDefinitionService.updateBudgetDefinition(budgetDefinitionDto))

@@ -98,7 +98,7 @@ public class TransactionService {
     public void setBudgetCycle(Transaction transaction) {
         Long subCategoryId = transaction.getSubCategory().getId();
         Instant transactionInstant = transaction.getTransactionDateTime();
-        BudgetCycle budgetCycle = budgetCycleService.getBudgetCycleByInstant(subCategoryId, transactionInstant, com.cashigo.expensio.common.security.UserContext.getUserId());
+        BudgetCycle budgetCycle = budgetCycleService.getBudgetCycleByInstant(subCategoryId, transactionInstant, UserContext.getUserId());
         transaction.setBudgetCycle(budgetCycle);
     }
 

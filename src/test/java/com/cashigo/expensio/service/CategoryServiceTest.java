@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -19,8 +20,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceTest {
@@ -35,11 +35,12 @@ public class CategoryServiceTest {
     @InjectMocks
     private CategoryService categoryService;
 
-    private String currentLoggedInUserId;
-
     @BeforeEach
     public void init() {
-        currentLoggedInUserId = UUID.randomUUID().toString();
+        String currentLoggedInUserId = UUID.randomUUID().toString();
+        try(MockedStatic<UserContext> mockedStatic = mockStatic(UserContext.class)) {
+            mockedStatic.when(UserContext::getUserId).thenReturn(currentLoggedInUserId);
+        }
         categoryService.setSystemCategories(7L);
     }
 
@@ -50,10 +51,9 @@ public class CategoryServiceTest {
         Category savedCategory = new Category();
         CategoryDto savedCategoryDto = new CategoryDto();
 
-        when(userContext.getUserId()).thenReturn(currentLoggedInUserId);
         when(categoryMapper.mapToEntity(unsavedCategoryDto)).thenReturn(unsavedCategory);
         when(categoryRepository.save(argThat(category ->
-            category.getUserId().equals(currentLoggedInUserId)
+            category.getUserId().equals(UserContext.getUserId())
         ))).thenReturn(savedCategory);
         when(categoryMapper.mapToDto(savedCategory)).thenReturn(savedCategoryDto);
 
@@ -70,8 +70,7 @@ public class CategoryServiceTest {
         Category updatedCategory = new Category();
         CategoryDto savedCategoryDto = new CategoryDto();
 
-        when(userContext.getUserId()).thenReturn(currentLoggedInUserId);
-        when(categoryRepository.findCategoryById(categoryId, currentLoggedInUserId))
+        when(categoryRepository.findCategoryById(categoryId, UserContext.getUserId()))
                 .thenReturn(Optional.of(savedCategory));
         when(categoryRepository.save(argThat(category ->
                 category.getName().equals("Custom Category")
@@ -100,9 +99,8 @@ public class CategoryServiceTest {
     @Test
     void whenDeletingCustomCategory_thenItIsRemovedFromDB() {
         Long categoryId = 20L;
-        when(userContext.getUserId()).thenReturn(currentLoggedInUserId);
         categoryService.deleteCategoryById(categoryId);
-        verify(categoryRepository).deleteCategoryByIdAndUserId(categoryId, currentLoggedInUserId);
+        verify(categoryRepository).deleteCategoryByIdAndUserId(categoryId, UserContext.getUserId());
     }
 
     private CategoryDto createCategory(Long id) {

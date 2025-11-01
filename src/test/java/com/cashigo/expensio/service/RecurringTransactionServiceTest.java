@@ -1,6 +1,7 @@
 package com.cashigo.expensio.service;
 
 import com.cashigo.expensio.common.consts.TransactionRecurrence;
+import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.exception.InvalidRecurrenceTransactionException;
 import com.cashigo.expensio.model.RecurringTransactionDefinition;
 import com.cashigo.expensio.model.Transaction;
@@ -11,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -34,13 +36,15 @@ public class RecurringTransactionServiceTest {
     @InjectMocks
     private RecurringTransactionService recurringTransactionService;
 
-    private String currentLoggedInUserId;
-
     @BeforeEach
     public void init() {
-        currentLoggedInUserId = UUID.randomUUID().toString();
+        String currentLoggedInUserId = UUID.randomUUID().toString();
+        try(MockedStatic<UserContext> mockedStatic = mockStatic(UserContext.class)) {
+            mockedStatic.when(UserContext::getUserId).thenReturn(currentLoggedInUserId);
+        }
         recurringTransactionService.setZone("Asia/Kolkata");
     }
+
 
     @ParameterizedTest
     @EnumSource(TransactionRecurrence.class)
@@ -49,7 +53,7 @@ public class RecurringTransactionServiceTest {
         Instant transactionDateTime = Instant.now();
         BigDecimal amount = BigDecimal.valueOf(2000L);
         transaction.setAmount(amount);
-        transaction.setUserId(currentLoggedInUserId);
+        transaction.setUserId(UserContext.getUserId());
         transaction.setTransactionDateTime(transactionDateTime);
 
         RecurringTransactionDefinition recurringTransactionDefinition =
@@ -70,7 +74,7 @@ public class RecurringTransactionServiceTest {
                 definition.getNextOccurrence().isEqual(nextOccurrence) &&
                 definition.getTransactionRecurrenceType().equals(transactionRecurrence) &&
                 definition.getAmount().equals(amount) &&
-                definition.getUserId().equals(currentLoggedInUserId) &&
+                definition.getUserId().equals(UserContext.getUserId()) &&
                 definition.getLastProcessedInstant().equals(transactionDateTime)
         ))).thenReturn(recurringTransactionDefinition);
 
@@ -87,7 +91,7 @@ public class RecurringTransactionServiceTest {
         Instant transactionDateTime = Instant.now().minusSeconds(60 * 60 * 24);
         BigDecimal amount = BigDecimal.valueOf(2000L);
         transaction.setAmount(amount);
-        transaction.setUserId(currentLoggedInUserId);
+        transaction.setUserId(UserContext.getUserId());
         transaction.setTransactionDateTime(transactionDateTime);
 
         assertThatThrownBy(() ->

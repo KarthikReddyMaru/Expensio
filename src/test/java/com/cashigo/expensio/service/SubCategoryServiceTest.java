@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
@@ -32,20 +33,19 @@ public class SubCategoryServiceTest {
     private CategoryRepository categoryRepository;
     @Mock
     private SubCategoryMapper subCategoryMapper;
-    @Mock
-    private UserContext userContext;
 
     @InjectMocks
     private SubCategoryService subCategoryService;
 
-    private String currentLoggedInUserId;
-
     @BeforeEach
     public void init() {
-        currentLoggedInUserId = UUID.randomUUID().toString();
-        when(userContext.getUserId()).thenReturn(currentLoggedInUserId);
+        String currentLoggedInUserId = UUID.randomUUID().toString();
+        try(MockedStatic<UserContext> mockedStatic = mockStatic(UserContext.class)) {
+            mockedStatic.when(UserContext::getUserId).thenReturn(currentLoggedInUserId);
+        }
         subCategoryService.setSystemSubCategories(32L);
     }
+
 
     @Test
     void whenSavingNewSubCategory_thenItIsPersisted() {
@@ -56,7 +56,7 @@ public class SubCategoryServiceTest {
         SubCategoryDto savedSubCategoryDto = new SubCategoryDto();
 
         when(subCategoryMapper.mapToEntity(unsavedSubCategoryDto)).thenCallRealMethod();
-        when(categoryRepository.existsCategoryById(categoryId, currentLoggedInUserId)).thenReturn(true);
+        when(categoryRepository.existsCategoryById(categoryId, UserContext.getUserId())).thenReturn(true);
         when(subCategoryRepository.save(argThat(unsavedSubCategory ->
             unsavedSubCategory.getId() == null &&
             unsavedSubCategory.getCategory() != null &&
@@ -68,8 +68,8 @@ public class SubCategoryServiceTest {
         SubCategoryDto actualDto = subCategoryService.saveSubCategory(unsavedSubCategoryDto);
 
         assertThat(actualDto).isEqualTo(savedSubCategoryDto);
-        verify(categoryRepository).existsCategoryById(categoryId, currentLoggedInUserId);
-        verify(subCategoryRepository, never()).existsSubCategoriesById(anyLong(), eq(currentLoggedInUserId));
+        verify(categoryRepository).existsCategoryById(categoryId, UserContext.getUserId());
+        verify(subCategoryRepository, never()).existsSubCategoriesById(anyLong(), eq(UserContext.getUserId()));
     }
 
     @Test
@@ -78,14 +78,14 @@ public class SubCategoryServiceTest {
         SubCategoryDto unsavedSubCategoryDto = new SubCategoryDto();
         unsavedSubCategoryDto.setCategoryId(categoryId);
 
-        when(categoryRepository.existsCategoryById(categoryId, currentLoggedInUserId)).thenReturn(false);
+        when(categoryRepository.existsCategoryById(categoryId, UserContext.getUserId())).thenReturn(false);
 
         assertThatThrownBy(() ->
                 subCategoryService.saveSubCategory(unsavedSubCategoryDto)
         ).isInstanceOf(NoCategoryFoundException.class);
 
-        verify(categoryRepository).existsCategoryById(categoryId, currentLoggedInUserId);
-        verify(subCategoryRepository, never()).existsSubCategoriesById(anyLong(), eq(currentLoggedInUserId));
+        verify(categoryRepository).existsCategoryById(categoryId, UserContext.getUserId());
+        verify(subCategoryRepository, never()).existsSubCategoriesById(anyLong(), eq(UserContext.getUserId()));
     }
 
     @Test
@@ -99,12 +99,12 @@ public class SubCategoryServiceTest {
         SubCategoryDto savedSubCategoryDto = new SubCategoryDto();
 
         when(subCategoryMapper.mapToEntity(unsavedSubCategoryDto)).thenCallRealMethod();
-        when(categoryRepository.existsCategoryById(categoryId, currentLoggedInUserId)).thenReturn(true);
-        when(subCategoryRepository.existsSubCategoriesById(subCategoryId, currentLoggedInUserId)).thenReturn(true);
+        when(categoryRepository.existsCategoryById(categoryId, UserContext.getUserId())).thenReturn(true);
+        when(subCategoryRepository.existsSubCategoriesById(subCategoryId, UserContext.getUserId())).thenReturn(true);
         when(subCategoryRepository.save(argThat(unsavedSubCategory ->
                 unsavedSubCategory.getId().equals(subCategoryId) &&
                 unsavedSubCategory.getName().equals("Updated Name") &&
-                unsavedSubCategory.getUserId().equals(currentLoggedInUserId) &&
+                unsavedSubCategory.getUserId().equals(UserContext.getUserId()) &&
                 unsavedSubCategory.getCategory() != null &&
                 unsavedSubCategory.getCategory().getId().equals(categoryId) &&
                 !unsavedSubCategory.isSystem()
@@ -114,8 +114,8 @@ public class SubCategoryServiceTest {
         SubCategoryDto actualDto = subCategoryService.saveSubCategory(unsavedSubCategoryDto);
 
         assertThat(actualDto).isEqualTo(savedSubCategoryDto);
-        verify(categoryRepository).existsCategoryById(categoryId, currentLoggedInUserId);
-        verify(subCategoryRepository).existsSubCategoriesById(subCategoryId, currentLoggedInUserId);
+        verify(categoryRepository).existsCategoryById(categoryId, UserContext.getUserId());
+        verify(subCategoryRepository).existsSubCategoriesById(subCategoryId, UserContext.getUserId());
     }
 
     @Test
@@ -124,7 +124,7 @@ public class SubCategoryServiceTest {
         SubCategoryDto unsavedSubCategoryDto = new SubCategoryDto();
         unsavedSubCategoryDto.setId(subCategoryId);
         unsavedSubCategoryDto.setCategoryId(categoryId);
-        when(categoryRepository.existsCategoryById(categoryId, currentLoggedInUserId))
+        when(categoryRepository.existsCategoryById(categoryId, UserContext.getUserId()))
                 .thenReturn(true);
 
         assertThatThrownBy(
@@ -140,9 +140,9 @@ public class SubCategoryServiceTest {
         SubCategoryDto unsavedSubCategoryDto = new SubCategoryDto();
         unsavedSubCategoryDto.setId(subCategoryId);
         unsavedSubCategoryDto.setCategoryId(categoryId);
-        when(categoryRepository.existsCategoryById(categoryId, currentLoggedInUserId))
+        when(categoryRepository.existsCategoryById(categoryId, UserContext.getUserId()))
                 .thenReturn(true);
-        when(subCategoryRepository.existsSubCategoriesById(subCategoryId, currentLoggedInUserId))
+        when(subCategoryRepository.existsSubCategoriesById(subCategoryId, UserContext.getUserId()))
                 .thenReturn(false);
 
         assertThatThrownBy(
@@ -160,7 +160,7 @@ public class SubCategoryServiceTest {
                 () -> subCategoryService.deleteSubCategory(subCategoryId)
         ).isInstanceOf(SystemPropertiesCannotBeModifiedException.class);
 
-        verify(subCategoryRepository, never()).deleteSubCategoryByIdAndUserId(subCategoryId, currentLoggedInUserId);
+        verify(subCategoryRepository, never()).deleteSubCategoryByIdAndUserId(subCategoryId, UserContext.getUserId());
     }
 
 }
