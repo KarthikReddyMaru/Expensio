@@ -1,6 +1,7 @@
 package com.cashigo.expensio.model;
 
 import com.cashigo.expensio.common.consts.Status.ImportStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,10 +25,8 @@ public class ImportMetaData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @JsonIgnore
     private UUID id;
-
-    @Column(nullable = false, updatable = false)
-    private Long categoriesCreated;
 
     @Column(nullable = false, updatable = false)
     private Long subCategoriesCreated;
@@ -41,10 +40,11 @@ public class ImportMetaData {
     @Column(nullable = false, updatable = false)
     private Long totalRecords;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private FileMetaData errorFile;
 
     @Column(updatable = false, nullable = false)
+    @JsonIgnore
     private String userId;
 
     @Column(nullable = false, updatable = false)

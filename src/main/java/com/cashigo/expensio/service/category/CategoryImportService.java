@@ -23,7 +23,7 @@ public class CategoryImportService {
     private final SubCategoryRepository subCategoryRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void createNonExistedCategories(HashMap<String, List<String>> categories) {
+    public long createNonExistedCategories(HashMap<String, List<String>> categories) {
 
         List<Category> existedCategories = categoryRepository
                 .findCategoriesOfUserWithSubCategories(UserContext.getUserId(), Sort.by("name"));
@@ -31,9 +31,12 @@ public class CategoryImportService {
         CategoryUtil.createCategoryCache(existedCategories);
 
         List<SubCategory> nonExistedSubCategories = CategoryUtil.createNonExistedSubCategories(categories);
-        subCategoryRepository.saveAllAndFlush(nonExistedSubCategories);
+        long newlyCreatedSubCategories = subCategoryRepository
+                .saveAllAndFlush(nonExistedSubCategories)
+                .size();
 
         CategoryUtil.clearCache();
+        return newlyCreatedSubCategories;
     }
 
 }

@@ -5,13 +5,11 @@ import com.cashigo.expensio.model.FileMetaData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
@@ -32,15 +30,12 @@ public class FileStorageService {
     );
 
     @SuppressWarnings(value = "path-traversal")
-    public FileMetaData storeFile(MultipartFile multipartFile) throws IOException {
-
-        if (multipartFile.getSize() > maxFileSize)
-            return null;
+    public FileMetaData storeFile(byte[] data, String originalFileName) throws IOException {
 
         Path uploadDir = Paths.get(fileStoragePath).toAbsolutePath().normalize();
         Files.createDirectories(uploadDir);
 
-        String originalFileName = sanitizeFilename(multipartFile.getOriginalFilename());
+        originalFileName = sanitizeFilename(originalFileName);
         String fileName = generateUniqueName(originalFileName);
         Path filePath = uploadDir.resolve(fileName).normalize();
 
@@ -48,13 +43,13 @@ public class FileStorageService {
             throw new SecurityException("Path traversal attempt detected");
         }
 
-        Files.copy(multipartFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        Files.write(filePath, data);
 
         return FileMetaData.builder()
-                .originalFileName(multipartFile.getOriginalFilename())
+                .originalFileName(originalFileName)
                 .storedFileName(fileName)
                 .filePath(filePath.toString())
-                .fileSize(multipartFile.getSize())
+                .fileSize((long) data.length)
                 .expiresAt(Instant.now().plus(Duration.ofDays(1)))
                 .status(FileStatus.ACTIVE)
                 .build();
@@ -95,7 +90,8 @@ public class FileStorageService {
         String fileExtension = getFileExtension(originalFileName);
         String timeStamp = Instant.now().toString();
         String uuid = UUID.randomUUID().toString().substring(0, 8);
-        return String.join("_", fileExtension, timeStamp, uuid);
+        String fileName = String.join("_", timeStamp, uuid);
+        return String.join(".", fileName, fileExtension);
     }
 
     private String getFileExtension(String fileName) {

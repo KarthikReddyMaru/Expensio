@@ -1,5 +1,6 @@
 HELP.md
 Dockerfile
+tmp/**
 .DS_Store
 src/.DS_Store
 target/

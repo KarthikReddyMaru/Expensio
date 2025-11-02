@@ -3,6 +3,8 @@ package com.cashigo.expensio.dto.summary;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,11 +31,11 @@ public class TransactionSummaryDto {
     private LocalTime transactionTime;
 
     @CsvBindByName(column = "Category")
-    @NotNull
+    @NotBlank(message = "Category cannot be empty or blank")
     private String category;
 
     @CsvBindByName(column = "SubCategory")
-    @NotNull
+    @NotBlank(message = "SubCategory cannot be empty or blank")
     private String subCategory;
 
     @CsvBindByName(column = "Amount", required = true)

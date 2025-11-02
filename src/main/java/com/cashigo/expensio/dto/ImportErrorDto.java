@@ -4,8 +4,6 @@ import com.opencsv.bean.CsvBindByName;
 import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 @Builder
 @Data
 public class ImportErrorDto {
