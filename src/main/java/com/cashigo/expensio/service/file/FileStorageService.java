@@ -2,11 +2,14 @@ package com.cashigo.expensio.service.file;
 
 import com.cashigo.expensio.common.consts.Status.FileStatus;
 import com.cashigo.expensio.model.FileMetaData;
+import com.cashigo.expensio.repository.FileMetaDataRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,6 +27,8 @@ public class FileStorageService {
 
     @Value("${file.storage.path}")
     private String fileStoragePath;
+
+    private final FileMetaDataRepository fileMetaDataRepository;
 
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
             "csv", "xlsx", "xls", "pdf", "txt"
@@ -53,6 +58,18 @@ public class FileStorageService {
                 .expiresAt(Instant.now().plus(Duration.ofDays(1)))
                 .status(FileStatus.ACTIVE)
                 .build();
+    }
+
+    public String getFileById(String fileName, OutputStream outputStream) throws IOException {
+        FileMetaData fileMetaData = fileMetaDataRepository.findById(fileName)
+                .orElseThrow(FileNotFoundException::new);
+
+        Path path = Paths.get(fileMetaData.getFilePath());
+        if (!Files.exists(path))
+            throw new FileNotFoundException("File not found on Disc");
+
+        Files.copy(path, outputStream);
+        return fileMetaData.getOriginalFileName();
     }
 
     /**

@@ -46,7 +46,8 @@ public class TransactionImportService {
     private final ImportMetaDataRepository importMetaDataRepository;
 
     @Transactional
-    public ImportMetaData parseTransactions(MultipartFile multipartFile) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
+    public ImportMetaData parseTransactions(MultipartFile multipartFile)
+            throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
 
         if (multipartFile == null || multipartFile.isEmpty())
             throw new IllegalArgumentException("Invalid File");
