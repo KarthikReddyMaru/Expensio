@@ -59,13 +59,23 @@ public class SubCategoryService {
     }
 
     @Transactional
-    @SneakyThrows
     public SubCategoryDto saveSubCategory(SubCategoryDto unsavedSubCategory) {
         checkCategoryModificationScope(unsavedSubCategory);
         checkSubCategoryModificationScope(unsavedSubCategory);
-
         SubCategory subCategory = subCategoryMapper.mapToEntity(unsavedSubCategory);
+        subCategory.setCategory(categoryRepository.getReferenceById(unsavedSubCategory.getCategoryId()));
         subCategory.setUserId(UserContext.getUserId());
+        SubCategory savedSubCategory = subCategoryRepository.save(subCategory);
+        return subCategoryMapper.mapToDto(savedSubCategory);
+    }
+
+    @Transactional
+    public SubCategoryDto updateSubCategory(SubCategoryDto unsavedSubCategory) {
+        checkCategoryModificationScope(unsavedSubCategory);
+        checkSubCategoryModificationScope(unsavedSubCategory);
+        SubCategory subCategory = subCategoryRepository.getReferenceById(unsavedSubCategory.getId());
+        subCategory.setName(unsavedSubCategory.getName());
+        subCategory.setCategory(categoryRepository.getReferenceById(unsavedSubCategory.getCategoryId()));
         SubCategory savedSubCategory = subCategoryRepository.save(subCategory);
         return subCategoryMapper.mapToDto(savedSubCategory);
     }

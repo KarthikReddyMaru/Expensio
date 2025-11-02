@@ -80,7 +80,7 @@ public class SubCategoryControllerTest {
         SubCategoryDto subCategoryDto = createSubCategory(subCategoryId, updatedSubCategoryName);
         SubCategoryDto updatedSubCategoryDto = createSubCategory(subCategoryId, updatedSubCategoryName);
 
-        when(subCategoryService.saveSubCategory(subCategoryDto)).thenReturn(updatedSubCategoryDto);
+        when(subCategoryService.updateSubCategory(subCategoryDto)).thenReturn(updatedSubCategoryDto);
 
         mockMvc.perform(put("/subcategory")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -88,7 +88,7 @@ public class SubCategoryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id").value(subCategoryId))
                 .andExpect(jsonPath("$.data.name").value(updatedSubCategoryName));
-        verify(subCategoryService).saveSubCategory(subCategoryDto);
+        verify(subCategoryService).updateSubCategory(subCategoryDto);
     }
 
     @Test
@@ -119,14 +119,14 @@ public class SubCategoryControllerTest {
         String updatedSubCategoryName = "Updated SubCategory";
         SubCategoryDto subCategoryDto = createSubCategory(subCategoryId, updatedSubCategoryName);
 
-        when(subCategoryService.saveSubCategory(subCategoryDto))
+        when(subCategoryService.updateSubCategory(subCategoryDto))
                 .thenThrow(NoSubCategoryFoundException.class);
 
         mockMvc.perform(put("/subcategory")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(subCategoryDto)))
                 .andExpect(status().isNotFound());
-        verify(subCategoryService).saveSubCategory(subCategoryDto);
+        verify(subCategoryService).updateSubCategory(subCategoryDto);
     }
 
     @Test
@@ -173,14 +173,14 @@ public class SubCategoryControllerTest {
         String updatedSubCategoryName = "Updated System SubCategory Name";
         SubCategoryDto systemSubCategory = createSubCategory(systemSubCategoryId, updatedSubCategoryName);
 
-        when(subCategoryService.saveSubCategory(systemSubCategory))
+        when(subCategoryService.updateSubCategory(systemSubCategory))
                 .thenThrow(SystemPropertiesCannotBeModifiedException.class);
 
         mockMvc.perform(put("/subcategory")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(systemSubCategory)))
                 .andExpect(status().isNotAcceptable());
-        verify(subCategoryService).saveSubCategory(systemSubCategory);
+        verify(subCategoryService).updateSubCategory(systemSubCategory);
     }
 
     private SubCategoryDto createSubCategory(Long id, String name) {

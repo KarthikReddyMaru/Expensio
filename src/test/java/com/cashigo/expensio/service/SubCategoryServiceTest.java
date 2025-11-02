@@ -6,6 +6,7 @@ import com.cashigo.expensio.dto.exception.NoCategoryFoundException;
 import com.cashigo.expensio.dto.exception.NoSubCategoryFoundException;
 import com.cashigo.expensio.dto.exception.SystemPropertiesCannotBeModifiedException;
 import com.cashigo.expensio.dto.mapper.SubCategoryMapper;
+import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.model.SubCategory;
 import com.cashigo.expensio.repository.CategoryRepository;
 import com.cashigo.expensio.repository.SubCategoryRepository;
@@ -50,6 +51,8 @@ public class SubCategoryServiceTest {
     @Test
     void whenSavingNewSubCategory_thenItIsPersisted() {
         Long categoryId = 8L;
+        Category category = new Category();
+        category.setId(categoryId);
         SubCategoryDto unsavedSubCategoryDto = new SubCategoryDto();
         unsavedSubCategoryDto.setCategoryId(categoryId);
         SubCategory savedSubCategory = new SubCategory();
@@ -57,6 +60,7 @@ public class SubCategoryServiceTest {
 
         when(subCategoryMapper.mapToEntity(unsavedSubCategoryDto)).thenCallRealMethod();
         when(categoryRepository.existsCategoryById(categoryId, UserContext.getUserId())).thenReturn(true);
+        when(categoryRepository.getReferenceById(categoryId)).thenReturn(category);
         when(subCategoryRepository.save(argThat(unsavedSubCategory ->
             unsavedSubCategory.getId() == null &&
             unsavedSubCategory.getCategory() != null &&
@@ -91,6 +95,8 @@ public class SubCategoryServiceTest {
     @Test
     void whenUpdatingSubCategory_thenItIsPersisted() {
         Long categoryId = 8L, subCategoryId = 34L;
+        Category category = new Category();
+        category.setId(categoryId);
         SubCategoryDto unsavedSubCategoryDto = new SubCategoryDto();
         unsavedSubCategoryDto.setName("Updated Name");
         unsavedSubCategoryDto.setId(subCategoryId);
@@ -100,6 +106,7 @@ public class SubCategoryServiceTest {
 
         when(subCategoryMapper.mapToEntity(unsavedSubCategoryDto)).thenCallRealMethod();
         when(categoryRepository.existsCategoryById(categoryId, UserContext.getUserId())).thenReturn(true);
+        when(categoryRepository.getReferenceById(categoryId)).thenReturn(category);
         when(subCategoryRepository.existsSubCategoriesById(subCategoryId, UserContext.getUserId())).thenReturn(true);
         when(subCategoryRepository.save(argThat(unsavedSubCategory ->
                 unsavedSubCategory.getId().equals(subCategoryId) &&

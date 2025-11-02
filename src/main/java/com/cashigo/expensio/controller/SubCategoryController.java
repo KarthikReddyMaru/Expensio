@@ -51,7 +51,7 @@ public class SubCategoryController {
     public ResponseEntity<Response<SubCategoryDto>> updateSubCategory(@Validated(OnUpdate.class)
                                                                           @RequestBody SubCategoryDto subCategory) {
         Response<SubCategoryDto> response = new Response<>();
-        SubCategoryDto savedSubCategory = subCategoryService.saveSubCategory(subCategory);
+        SubCategoryDto savedSubCategory = subCategoryService.updateSubCategory(subCategory);
         response.setData(savedSubCategory);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

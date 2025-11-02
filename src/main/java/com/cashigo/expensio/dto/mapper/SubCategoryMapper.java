@@ -1,7 +1,6 @@
 package com.cashigo.expensio.dto.mapper;
 
 import com.cashigo.expensio.dto.SubCategoryDto;
-import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.model.SubCategory;
 import org.springframework.stereotype.Component;
 
@@ -16,13 +15,6 @@ public class SubCategoryMapper implements BiMapper<SubCategoryDto, SubCategory> 
         sub.setId(dto.getId());
         sub.setName(dto.getName());
         sub.setSystem(dto.isSystem());
-
-        if (dto.getCategoryId() != null) {
-            Category cat = new Category();
-            cat.setId(dto.getCategoryId());
-            sub.setCategory(cat);
-        }
-
         return sub;
     }
 
