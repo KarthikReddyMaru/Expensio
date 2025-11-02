@@ -19,7 +19,6 @@ import org.hibernate.annotations.CreationTimestamp;
 @AllArgsConstructor
 @Table(
         indexes = {
-                @Index(name = "file_stored_name_idx", columnList = "stored_file_name"),
                 @Index(name = "file_status_idx", columnList = "status"),
                 @Index(name = "file_expires_idx", columnList = "expires_at")
         }
@@ -27,14 +26,10 @@ import org.hibernate.annotations.CreationTimestamp;
 public class FileMetaData {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String storedFileName;
 
     @Column(nullable = false)
     private String originalFileName;
-
-    @Column(nullable = false)
-    private String storedFileName;
 
     @Column(nullable = false)
     private Long fileSize;
