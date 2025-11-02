@@ -1,7 +1,7 @@
 package com.cashigo.expensio.controller;
 
 import com.cashigo.expensio.common.documentation.StandardErrorResponses;
-import com.cashigo.expensio.service.TransactionExportService;
+import com.cashigo.expensio.service.transaction.TransactionExportService;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import io.swagger.v3.oas.annotations.Operation;

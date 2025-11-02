@@ -10,6 +10,7 @@ import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.model.SubCategory;
 import com.cashigo.expensio.repository.CategoryRepository;
 import com.cashigo.expensio.repository.SubCategoryRepository;
+import com.cashigo.expensio.service.category.SubCategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

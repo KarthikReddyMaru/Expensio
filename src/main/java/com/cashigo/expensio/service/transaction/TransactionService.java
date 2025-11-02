@@ -1,4 +1,4 @@
-package com.cashigo.expensio.service;
+package com.cashigo.expensio.service.transaction;
 
 import com.cashigo.expensio.common.consts.TransactionRecurrence;
 import com.cashigo.expensio.common.security.UserContext;
@@ -9,6 +9,7 @@ import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.RecurringTransactionDefinition;
 import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.TransactionRepository;
+import com.cashigo.expensio.service.budget.BudgetCycleService;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;

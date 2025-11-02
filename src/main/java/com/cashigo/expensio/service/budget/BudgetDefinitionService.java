@@ -1,4 +1,4 @@
-package com.cashigo.expensio.service;
+package com.cashigo.expensio.service.budget;
 
 import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.dto.BudgetDefinitionDto;

@@ -1,7 +1,7 @@
 package com.cashigo.expensio.controller;
 
 import com.cashigo.expensio.common.documentation.StandardErrorResponses;
-import com.cashigo.expensio.service.RecurringTransactionService;
+import com.cashigo.expensio.service.transaction.RecurringTransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

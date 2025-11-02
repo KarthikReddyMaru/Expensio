@@ -3,7 +3,7 @@ package com.cashigo.expensio.controller;
 import com.cashigo.expensio.config.SecurityConfig;
 import com.cashigo.expensio.dto.TransactionDto;
 import com.cashigo.expensio.dto.exception.NoTransactionFoundException;
-import com.cashigo.expensio.service.TransactionService;
+import com.cashigo.expensio.service.transaction.TransactionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

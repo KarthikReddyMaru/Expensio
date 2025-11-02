@@ -6,6 +6,7 @@ import com.cashigo.expensio.dto.exception.SystemPropertiesCannotBeModifiedExcept
 import com.cashigo.expensio.dto.mapper.CategoryMapper;
 import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.repository.CategoryRepository;
+import com.cashigo.expensio.service.category.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

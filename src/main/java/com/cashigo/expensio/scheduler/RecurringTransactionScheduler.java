@@ -5,7 +5,7 @@ import com.cashigo.expensio.model.RecurringTransactionDefinition;
 import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.RecurringTransactionDefinitionRepository;
 import com.cashigo.expensio.repository.TransactionRepository;
-import com.cashigo.expensio.service.BudgetCycleService;
+import com.cashigo.expensio.service.budget.BudgetCycleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

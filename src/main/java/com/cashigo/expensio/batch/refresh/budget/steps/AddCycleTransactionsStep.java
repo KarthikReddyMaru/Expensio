@@ -6,7 +6,7 @@ import com.cashigo.expensio.model.BudgetDefinition;
 import com.cashigo.expensio.model.Category;
 import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.TransactionRepository;
-import com.cashigo.expensio.service.BudgetTrackingService;
+import com.cashigo.expensio.service.budget.BudgetTrackingService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

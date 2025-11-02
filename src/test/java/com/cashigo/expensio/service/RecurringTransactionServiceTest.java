@@ -6,6 +6,7 @@ import com.cashigo.expensio.dto.exception.InvalidRecurrenceTransactionException;
 import com.cashigo.expensio.model.RecurringTransactionDefinition;
 import com.cashigo.expensio.model.Transaction;
 import com.cashigo.expensio.repository.RecurringTransactionDefinitionRepository;
+import com.cashigo.expensio.service.transaction.RecurringTransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

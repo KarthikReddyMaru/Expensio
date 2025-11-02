@@ -4,7 +4,7 @@ import com.cashigo.expensio.config.SecurityConfig;
 import com.cashigo.expensio.dto.SubCategoryDto;
 import com.cashigo.expensio.dto.exception.NoSubCategoryFoundException;
 import com.cashigo.expensio.dto.exception.SystemPropertiesCannotBeModifiedException;
-import com.cashigo.expensio.service.SubCategoryService;
+import com.cashigo.expensio.service.category.SubCategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

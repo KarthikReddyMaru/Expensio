@@ -1,4 +1,4 @@
-package com.cashigo.expensio.service;
+package com.cashigo.expensio.service.transaction;
 
 import com.cashigo.expensio.common.consts.TransactionRecurrence;
 import com.cashigo.expensio.common.security.UserContext;
@@ -16,8 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j

@@ -5,7 +5,7 @@ import com.cashigo.expensio.common.validation.OnCreate;
 import com.cashigo.expensio.common.validation.OnUpdate;
 import com.cashigo.expensio.dto.BudgetDefinitionDto;
 import com.cashigo.expensio.dto.Response;
-import com.cashigo.expensio.service.BudgetDefinitionService;
+import com.cashigo.expensio.service.budget.BudgetDefinitionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

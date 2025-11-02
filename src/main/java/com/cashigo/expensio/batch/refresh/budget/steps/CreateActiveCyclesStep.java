@@ -5,7 +5,7 @@ import com.cashigo.expensio.dto.mapper.UUIDMapper;
 import com.cashigo.expensio.model.BudgetCycle;
 import com.cashigo.expensio.model.BudgetDefinition;
 import com.cashigo.expensio.repository.BudgetCycleRepository;
-import com.cashigo.expensio.service.BudgetCycleService;
+import com.cashigo.expensio.service.budget.BudgetCycleService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.batch.core.Step;

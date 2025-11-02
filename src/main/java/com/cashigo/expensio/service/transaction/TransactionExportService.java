@@ -1,4 +1,4 @@
-package com.cashigo.expensio.service;
+package com.cashigo.expensio.service.transaction;
 
 import com.cashigo.expensio.common.security.UserContext;
 import com.cashigo.expensio.common.util.CsvUtil;
