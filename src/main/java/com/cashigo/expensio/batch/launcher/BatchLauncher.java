@@ -1,11 +1,14 @@
 package com.cashigo.expensio.batch.launcher;
 
 import com.cashigo.expensio.common.consts.BudgetRecurrence;
+import com.cashigo.expensio.common.documentation.StandardErrorResponses;
+import com.cashigo.expensio.common.util.ZoneUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
@@ -14,15 +17,18 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
+@Slf4j
 @RestController
 @RequestMapping("/batch")
+@StandardErrorResponses
 @Tag(name = "Refresh Transactions/Cycles")
 public class BatchLauncher {
 
@@ -30,15 +36,19 @@ public class BatchLauncher {
     private final Job refreshWeeklyBudgets;
     private final Job refreshMonthlyBudgets;
     private final Job processRecurringTransactions;
+    private final Job csvErrorFileCleanUp;
 
     public BatchLauncher(JobLauncher jobLauncher,
                          @Qualifier("refreshWeeklyBudgets") Job refreshWeeklyBudgets,
                          @Qualifier("refreshMonthlyBudgets") Job refreshMonthlyBudgets,
-                         @Qualifier("processRecurringTransactions") Job processRecurringTransactions) {
+                         @Qualifier("processRecurringTransactions") Job processRecurringTransactions,
+                         @Qualifier("csvErrorFileCleanUp") Job csvErrorFileCleanUp
+    ) {
         this.jobLauncher = jobLauncher;
         this.refreshWeeklyBudgets = refreshWeeklyBudgets;
         this.refreshMonthlyBudgets = refreshMonthlyBudgets;
         this.processRecurringTransactions = processRecurringTransactions;
+        this.csvErrorFileCleanUp = csvErrorFileCleanUp;
     }
 
     @GetMapping("/budget/week")
@@ -76,6 +86,26 @@ public class BatchLauncher {
                 .toJobParameters();
         jobLauncher.run(processRecurringTransactions, jobParameters);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("cleanup")
+    @Operation(
+            summary = "Clean up error csv files",
+            parameters = {
+                    @Parameter(name = "date", example = "10-10-2020"),
+                    @Parameter(name = "time", example = "16:10:03")
+            }
+    )
+    @ApiResponse(responseCode = "200")
+    @SneakyThrows
+    public ResponseEntity<Void> cleanUpErrorCsvFiles(String date, @RequestParam(required = false) String time) {
+        String instant = ZoneUtil.getInstant(date, time).toString();
+        log.info("Instant: {}", instant);
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addJobParameter("now", new JobParameter<>(instant, String.class))
+                .toJobParameters();
+        jobLauncher.run(csvErrorFileCleanUp, jobParameters);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

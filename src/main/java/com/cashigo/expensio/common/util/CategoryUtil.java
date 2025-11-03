@@ -50,8 +50,10 @@ public class CategoryUtil {
             Category currentCategory = categoryMap.get(categoryName);
 
             for (String subCategory : entry.getValue()) {
-                if (!subCategoryMap.get(categoryName).contains(subCategory.toLowerCase()))
+                if (!subCategoryMap.get(categoryName).contains(subCategory.toLowerCase())) {
                     subCategories.add(CategoryUtil.createSubCategory(currentCategory, subCategory));
+                    subCategoryMap.get(categoryName).add(subCategory.toLowerCase());
+                }
             }
         }
 

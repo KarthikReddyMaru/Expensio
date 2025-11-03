@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 
@@ -65,4 +66,11 @@ public class ZoneUtil {
         return getEndOfMonthInstant(Instant.now());
     }
 
+    public static Instant getInstant(String date, String time) {
+        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        LocalTime localTime = LocalTime.MIN;
+        if (time != null)
+            localTime = LocalTime.parse(time);
+        return LocalDateTime.of(localDate, localTime).atZone(getZoneId()).toInstant();
+    }
 }
